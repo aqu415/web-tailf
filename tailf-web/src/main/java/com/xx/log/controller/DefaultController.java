@@ -16,7 +16,7 @@ public class DefaultController {
 
     /**
      * 跳转首页
-     *
+     * @param model
      * @return
      */
     @RequestMapping("/main")
@@ -26,6 +26,12 @@ public class DefaultController {
         return "main";
     }
 
+    /***
+     * 跳转日志页
+     * @param request
+     * @param model
+     * @return
+     */
     @RequestMapping("/index")
     public String index(HttpServletRequest request, Model model) {
         model.addAttribute("pathKey", request.getParameter("pathKey"));

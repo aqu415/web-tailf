@@ -1,12 +1,12 @@
 server:
   port: 10086
-log-config:
-  path:
-    path01: /mnt/syslogs/tomcat
-    path02: D:/log
 
 spring:
   thymeleaf:
     cache: false
     prefix: classpath:/templates/
     suffix: .html
+
+# 第一次加载默认展示的日志行数
+log-config:
+  defaultShowLineNum: 20

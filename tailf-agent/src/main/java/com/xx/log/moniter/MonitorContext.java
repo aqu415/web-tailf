@@ -10,23 +10,38 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MonitorContext {
 
     /***目录监听器*/
-    private static Map<String/**dir*/, FileAlterationMonitor/**monitor*/> fileMonitor = new ConcurrentHashMap<>();
+    private static Map<String/**path*/, FileAlterationMonitor/**monitor*/> fileMonitor = new ConcurrentHashMap<>();
 
     /***文件读取位置*/
-    private static Map<String /***file*/, Long/***line offset*/> fileLine = new ConcurrentHashMap<>();
+    private static Map<String /***path*/, Long/***line offset*/> fileLine = new ConcurrentHashMap<>();
 
     /**
      * 注册监目录听器
      *
      * @param path
      */
-    public static void register(String path) {
+    public synchronized static void register(String path) {
         File file = new File(path);
         if (file.exists() && fileMonitor.get(file.getParent()) == null) {
             Agent agent = SpringUtil.getBean(Agent.class);
             FileAlterationMonitor monitor = agent.registerMonitor(path);
             fileMonitor.put(file.getParent(), monitor);
         }
+    }
+
+    /**
+     * 取消监听
+     *
+     * @param path
+     */
+    public synchronized static void unRegister(String path) {
+        FileAlterationMonitor monitor = fileMonitor.remove(path);
+        try {
+            monitor.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        fileLine.remove(path);
     }
 
     /**

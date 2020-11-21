@@ -3,6 +3,7 @@ package com.xx.log.cmd.handler;
 import java.io.File;
 import java.io.IOException;
 
+import com.xx.log.properties.LogProperties;
 import org.springframework.stereotype.Service;
 
 import com.xx.log.cmd.CMDType;
@@ -12,9 +13,14 @@ import com.xx.log.moniter.MonitorContext;
 import com.xx.log.session.SessionContext;
 import com.xx.log.util.ContentUtil;
 
+import javax.annotation.Resource;
+
 @CMDType(cmd = BindPathCmd.class)
 @Service
 public class BindHandler implements CmdHandler {
+
+    @Resource
+    private LogProperties logProperties;
 
     @Override
     public void handleCMD(BaseCmd baseCmd) {
@@ -30,7 +36,7 @@ public class BindHandler implements CmdHandler {
         
         try {
         	// 获得文件最后几行内容
-			String lastContent = ContentUtil.readLastRows(bindPathCmd.getPathKey(), 10);
+			String lastContent = ContentUtil.readLastRows(bindPathCmd.getPathKey(), logProperties.getDefaultShowLineNum());
 			bindPathCmd.getSession().getBasicRemote().sendText(lastContent);
 			// 记录内容读取偏移量
 			MonitorContext.setOffset(file.getAbsolutePath(), file.length());

@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+      xmlns:th="http://www.thymeleaf.org"
+>
 <head>
-<meta charset="UTF-8" />
-<title>Web tailf</title>
-<link rel="shortcut icon" type="image/x-icon" th:href="@{/static/img/favicon.ico}">
-<link rel="stylesheet" th:href="@{/css/zTreeStyle.css}" type="text/css">
-<script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
-<script type="text/javascript" th:src="@{/js/jquery.ztree.core.min.js}"></script>
-<style>
+    <meta charset="UTF-8"/>
+    <title>Web tailf</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/static/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/css/zTreeStyle.css}" type="text/css">
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.ztree.core.min.js}"></script>
+    <style>
 /* layout */
 .wrap {
 	margin: 0 auto;
@@ -44,8 +44,10 @@
 .div_btn_choose {
     background-color: #e8e8de;
 }
-</style>
-<script>
+
+
+    </style>
+    <script>
 
 	$(function() {
 		/**初始化菜单*/
@@ -61,15 +63,29 @@
 	/**初始化树*/
 	var zTreeObj;
 	function initTree() {
-		// zTree 的参数配置，深入使用请参考 API 文档（setting 配置详解）
+		// zTree 的参数配置，深入使用请参考 API 文档（http://www.treejs.cn/v3/main.php#_zTreeInfo）
 		var setting = {
 				callback: {
 					        onClick: zTreeClick,onExpand: zTreeExpand
 					    }
 		};
 		zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, getRootNodes());
+		
+		// 展开第一个节点
+		openTree();
 	}
 
+	/**展开第一个节点*/
+	function openTree(){
+		setTimeout(function(){
+			var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+			var nodes = treeObj.getNodes();
+			if (nodes.length>0) {
+				getNodeByParam(nodes[0]);
+				treeObj.expandNode(nodes[0], true, true, true);
+			}
+		},300);
+	}
 	/**点击事件*/
 	function zTreeClick(tree, treeDOMId, node){
 		if(!node.children){
@@ -79,11 +95,16 @@
 		zTreeObj.expandNode(zTreeObj.getNodeByParam("id", nodeId));//展开指定节点
 		let path = node.path;
 		let name = node.name;
-		if(!node.isParent && (path.indexOf('.log') > -1 || path.indexOf('.txt') > -1)){
+		if(!node.isParent && (endWith(path,'.log') || endWith(path,'.txt'))){
 			showFrame(path,nodeId,name);
 		}
 	}
-	
+
+	function endWith(src,str){
+	  var reg = new RegExp(str + "$");
+	  return reg.test(src);
+	}
+
 	/**展开事件*/
 	function zTreeExpand(tree, treeDOMId, node){
 		if(!node.children){
@@ -162,26 +183,28 @@
 			iframe.show();
 		}
 	}
-</script>
+
+
+    </script>
 </head>
 <input id='path_config' th:value="${path}" type="hidden">
 <body style="font: 13px/21px Arial, sans-serif">
 
-    <!-- 左右布局 -->
-	<div class="wrap">
-	    <!--左菜单 -->
-		<aside id="left">
-			<div>
-				<ul id="treeDemo" class="ztree"></ul>
-			</div>
-		</aside>
-		
-		<!--右内容 -->
-		<section id="right">
-			<div style="height: 42px;overflow:auto;" id="tab_div"></div>
-			<hr>
-			<div id="content" style="border: 1px solid #aba094;"></div>
-		</section>
-	</div>
+<!-- 左右布局 -->
+<div class="wrap">
+    <!--左菜单 -->
+    <aside id="left">
+        <div>
+            <ul id="treeDemo" class="ztree"></ul>
+        </div>
+    </aside>
+
+    <!--右内容 -->
+    <section id="right">
+        <div style="height: 42px;overflow:auto;" id="tab_div"></div>
+        <hr>
+        <div id="content" style="border: 1px solid #aba094;"></div>
+    </section>
+</div>
 </body>
 </html>

@@ -1,9 +1,9 @@
 package com.xx.log.cmd.type;
 
-import javax.websocket.Session;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import javax.websocket.Session;
 
 @Data
 @EqualsAndHashCode(callSuper = false)

@@ -1,19 +1,17 @@
 package com.xx.log.cmd.handler;
 
-import java.io.File;
-import java.io.IOException;
-
-import com.xx.log.properties.LogProperties;
-import org.springframework.stereotype.Service;
-
 import com.xx.log.cmd.CMDType;
 import com.xx.log.cmd.type.BaseCmd;
 import com.xx.log.cmd.type.BindPathCmd;
 import com.xx.log.moniter.MonitorContext;
+import com.xx.log.properties.LogProperties;
 import com.xx.log.session.SessionContext;
 import com.xx.log.util.ContentUtil;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
 
 @CMDType(cmd = BindPathCmd.class)
 @Service

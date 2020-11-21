@@ -1,14 +1,14 @@
 package com.xx.log.moniter;
 
-import java.io.File;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.HiddenFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class Agent {

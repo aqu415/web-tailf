@@ -1,190 +1,146 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org"
->
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
     <title>Web tailf</title>
     <link rel="shortcut icon" type="image/x-icon" th:href="@{/static/img/favicon.ico}">
     <link rel="stylesheet" th:href="@{/css/zTreeStyle.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/main.css}" type="text/css">
+
     <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
     <script type="text/javascript" th:src="@{/js/jquery.ztree.core.min.js}"></script>
-    <style>
-/* layout */
-.wrap {
-	margin: 0 auto;
-}
-
-#left {
-	width: 200px;
-	min-height: 500px;
-	float: left;
-}
-
-#right {
-	min-height: 500px;
-	margin-left: 200px;
-}
-
-/* content */
-.tab {
-	float: left;
-}
-
-.div_btn {
-	border: 1px solid burlywood;
-	margin-left: 5px;
-	width: 120px;
-	border-radius: 5px;
-	text-align: center;
-	cursor: pointer;
-	float: left;
-}
-/**选中的tab*/
-.div_btn_choose {
-    background-color: #e8e8de;
-}
-
-
-    </style>
     <script>
+        $(function() {
+            /**初始化菜单*/
+            initView();
+            initTree();
+            setInterval(function() {
+                let height = $(window).height() - 100;
+                $('iframe').attr('height', height + 'px');
+            }, 1000);
+        });
 
-	$(function() {
-		/**初始化菜单*/
-		initView();
-		initTree();
+        /**初始化树*/
+        var zTreeObj;
+        function initTree() {
+            // zTree 的参数配置，深入使用请参考 API 文档（http://www.treejs.cn/v3/main.php#_zTreeInfo）
+            var setting = {
+                    callback:{onClick: zTreeClick,onExpand: zTreeExpand}
+            };
+            zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, getRootNodes());
 
-		setInterval(function() {
-			let height = $(window).height() - 100;
-			$('iframe').attr('height', height + 'px');
-		}, 1000);
-	});
+            // 展开第一个节点
+            openTree();
+        }
 
-	/**初始化树*/
-	var zTreeObj;
-	function initTree() {
-		// zTree 的参数配置，深入使用请参考 API 文档（http://www.treejs.cn/v3/main.php#_zTreeInfo）
-		var setting = {
-				callback: {
-					        onClick: zTreeClick,onExpand: zTreeExpand
-					    }
-		};
-		zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, getRootNodes());
-		
-		// 展开第一个节点
-		openTree();
-	}
+        /**展开第一个节点*/
+        function openTree(){
+            setTimeout(function(){
+                var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+                var nodes = treeObj.getNodes();
+                if (nodes.length>0) {
+                    getNodeByParam(nodes[0]);
+                    treeObj.expandNode(nodes[0], true, true, true);
+                }
+            },300);
+        }
+        /**点击事件*/
+        function zTreeClick(tree, treeDOMId, node){
+            if(!node.children){
+                getNodeByParam(node);
+            }
+            let nodeId = node.id;
+            zTreeObj.expandNode(zTreeObj.getNodeByParam("id", nodeId));//展开指定节点
+            let path = node.path;
+            let name = node.name;
+            if(!node.isParent && (endWith(path,'.log') || endWith(path,'.txt'))){
+                showFrame(path,nodeId,name);
+            }
+        }
 
-	/**展开第一个节点*/
-	function openTree(){
-		setTimeout(function(){
-			var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
-			var nodes = treeObj.getNodes();
-			if (nodes.length>0) {
-				getNodeByParam(nodes[0]);
-				treeObj.expandNode(nodes[0], true, true, true);
-			}
-		},300);
-	}
-	/**点击事件*/
-	function zTreeClick(tree, treeDOMId, node){
-		if(!node.children){
-			getNodeByParam(node);
-		}
-		let nodeId = node.id;
-		zTreeObj.expandNode(zTreeObj.getNodeByParam("id", nodeId));//展开指定节点
-		let path = node.path;
-		let name = node.name;
-		if(!node.isParent && (endWith(path,'.log') || endWith(path,'.txt'))){
-			showFrame(path,nodeId,name);
-		}
-	}
+        function endWith(src,str){
+          var reg = new RegExp(str + "$");
+          return reg.test(src);
+        }
 
-	function endWith(src,str){
-	  var reg = new RegExp(str + "$");
-	  return reg.test(src);
-	}
+        /**展开事件*/
+        function zTreeExpand(tree, treeDOMId, node){
+            if(!node.children){
+                getNodeByParam(node);
+            }
+        }
 
-	/**展开事件*/
-	function zTreeExpand(tree, treeDOMId, node){
-		if(!node.children){
-			getNodeByParam(node);
-		}
-	}
-	
-	/**根据参数获得路径*/
-	function getNodeByParam(node){
-		$.get('/path?key=' + node.path, function(data){
-			let data_ = JSON.parse(data);
-			for(i in data_){
-				let item = data_[i];
-				item.id = 'P_' + Math.random() * 100;
-				zTreeObj.addNodes(node, item, true);
-			}
-		});
-	}
-	
-	/**获得根元素*/
-	function getRootNodes(){
-		let arr = [];
-		let cur = $('#path_config').val();
-		if (cur) {
-			let all = cur.split(';');
-			for (let i in all) {
-				let item = all[i];
-				let node = {};
-				node.name = item;
-				node.path = item;
-				node.open = false;
-				node.isParent = true;
-				node.id = 'P_' + Math.random() * 100;
-				arr.push(node);
-			}
-		}
-		return arr;
-	}
-	
-	/**初始化菜单*/
-	function initView() {
-		$('.tab_item').remove();
-	}
+        /**根据参数获得路径*/
+        function getNodeByParam(node){
+            $.get('/path?key=' + node.path, function(data){
+                let data_ = JSON.parse(data);
+                for(i in data_){
+                    let item = data_[i];
+                    item.id = 'P_' + Math.random() * 100;
+                    zTreeObj.addNodes(node, item, true);
+                }
+            });
+        }
 
-	/***加载frame*/
-	function showFrame(path,nodeId,name) {
-		// iframe
-		$('.iframe').hide();
-		nodeId = nodeId.replace(/\./,'_');
-		let id = 'iframe_' + nodeId;
-		let iframe = $('#' + id);
-		let iframeLength = iframe.length;
-		
-		//div_btn
-		$('.div_btn').removeClass('div_btn_choose');
-		
-		if(iframeLength > 0) {
-			iframe.show();
-			$('#div_btn_' + nodeId).addClass('div_btn_choose');
-		} else {
-			$('#tab_div').append("<div id='div_btn_" + nodeId + "' bindId ='" + id + "' class='div_btn div_btn_choose' title='" + path + "' onclick='showFrame_(this)'>" + name + "</div>");
-			$('#content').append('<iframe id="' + id + '" class="iframe" frameborder="0" src="/index?pathKey=' + path + '" width="100%"></iframe>');	
-		}
-	}
-	
-	/**按钮切换*/
-	function showFrame_(obj){
-		let tab = $(obj);
-		let iframeId = tab.attr('bindId');
-		let iframe = $('#' + iframeId);
-		if(iframe.length > 0){
-			$('.iframe').hide();
-			$('.div_btn').removeClass('div_btn_choose');
-			
-			tab.addClass('div_btn_choose');
-			iframe.show();
-		}
-	}
+        /**获得根元素*/
+        function getRootNodes(){
+            let arr = [];
+            let cur = $('#path_config').val();
+            if (cur) {
+                let all = cur.split(';');
+                for (let i in all) {
+                    let item = all[i];
+                    let node = {};
+                    node.name = item;
+                    node.path = item;
+                    node.open = false;
+                    node.isParent = true;
+                    node.id = 'P_' + Math.random() * 100;
+                    arr.push(node);
+                }
+            }
+            return arr;
+        }
 
+        /**初始化菜单*/
+        function initView() {
+            $('.tab_item').remove();
+        }
 
+        /***加载frame*/
+        function showFrame(path,nodeId,name) {
+            // iframe
+            $('.iframe').hide();
+            nodeId = nodeId.replace(/\./,'_');
+            let id = 'iframe_' + nodeId;
+            let iframe = $('#' + id);
+            let iframeLength = iframe.length;
+
+            //div_btn
+            $('.div_btn').removeClass('div_btn_choose');
+
+            if(iframeLength > 0) {
+                iframe.show();
+                $('#div_btn_' + nodeId).addClass('div_btn_choose');
+            } else {
+                $('#tab_div').append("<div id='div_btn_" + nodeId + "' bindId ='" + id + "' class='div_btn div_btn_choose' title='" + path + "' onclick='showFrame_(this)'>" + name + "</div>");
+                $('#content').append('<iframe id="' + id + '" class="iframe" frameborder="0" src="/index?pathKey=' + path + '" width="100%"></iframe>');
+            }
+        }
+
+        /**按钮切换*/
+        function showFrame_(obj){
+            let tab = $(obj);
+            let iframeId = tab.attr('bindId');
+            let iframe = $('#' + iframeId);
+            if(iframe.length > 0){
+                $('.iframe').hide();
+                $('.div_btn').removeClass('div_btn_choose');
+
+                tab.addClass('div_btn_choose');
+                iframe.show();
+            }
+        }
     </script>
 </head>
 <input id='path_config' th:value="${path}" type="hidden">

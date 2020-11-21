@@ -1,0 +1,30 @@
+/* layout */
+.wrap {
+    margin: 0 auto;
+}
+#left {
+    width: 200px;
+    min-height: 500px;
+    float: left;
+}
+#right {
+    min-height: 500px;
+    margin-left: 200px;
+}
+/* content */
+.tab {
+    float: left;
+}
+.div_btn {
+    border: 1px solid burlywood;
+    margin-left: 5px;
+    width: 120px;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    float: left;
+}
+/**选中的tab*/
+.div_btn_choose {
+    background-color: #e8e8de;
+}

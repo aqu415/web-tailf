@@ -2,7 +2,6 @@ package com.xx.log.cmd.handler;
 
 import com.xx.log.cmd.CMDType;
 import com.xx.log.cmd.type.BaseCmd;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;

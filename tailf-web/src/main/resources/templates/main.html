@@ -15,11 +15,16 @@
             initView();
             initTree();
             setInterval(function() {
-                let height = $(window).height() - 100;
-                $('iframe').attr('height', height + 'px');
-                $('.column-left').css('height', height + 'px');
+                autoAdjust();
             }, 1000);
         });
+
+        // 调整UI
+        function autoAdjust(){
+            let height = ($(window).height() - 100) + 'px';
+            $('iframe').attr('height', height);
+            $('.column-left').css('height', height);
+        }
 
         /**初始化树*/
         var zTreeObj;
@@ -127,6 +132,9 @@
                 $('#tab_div').append("<div id='div_btn_" + nodeId + "' bindId ='" + id + "' class='div_btn div_btn_choose' title='" + path + "' onclick='showFrame_(this)'>" + name + "</div>");
                 $('#content').append('<iframe id="' + id + '" class="iframe" frameborder="0" src="/index?pathKey=' + path + '" width="100%"></iframe>');
             }
+
+            // 调整UI
+            autoAdjust();
         }
 
         /**按钮切换*/

@@ -3,6 +3,7 @@
     overflow: hidden;
 }
 .column-left {
+    height:600px;
     position: relative;
     float: left;
 }

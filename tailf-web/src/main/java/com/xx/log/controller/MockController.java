@@ -12,11 +12,11 @@ import java.util.Date;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import com.xx.log.pojo.Path;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSONObject;
-import com.xx.log.pojo.Path;
 import com.xx.log.properties.LogProperties;
 import com.xx.log.session.SessionContext;
 

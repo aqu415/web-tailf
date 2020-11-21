@@ -1,2 +1,2 @@
 # tailf
-一个简单日志查看工具，类似linux tail的web版本
+一个类似linux tail的web版本日志查看工具

@@ -14,6 +14,12 @@ public class DefaultController {
     @Autowired
     private LogProperties logProperties;
 
+    @RequestMapping("/manage")
+    public String manage(Model model){
+        // 查询所有有心跳的服务端
+        return "manage";
+    }
+
     /**
      * 跳转首页
      * @param model

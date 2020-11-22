@@ -53,7 +53,16 @@
 
             /**初始化树*/
             $(function(){
+                /**初始化树*/
                 initTree();
+
+                // 展开第一个节点
+                openTree();
+
+                //调整iframe高度
+                setInterval(function() {
+                    autoAdjust();
+            }, 1000);
             });
         });
 
@@ -84,6 +93,18 @@
                 }
             }
             return arr;
+        }
+
+        /**展开第一个节点*/
+        function openTree(){
+            setTimeout(function(){
+                var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+                var nodes = treeObj.getNodes();
+                if (nodes.length>0) {
+                    getNodeByParam(nodes[0]);
+                    treeObj.expandNode(nodes[0], true, true, true);
+                }
+            },300);
         }
 
         /**点击事件*/
@@ -126,32 +147,30 @@
 
         /***加载frame*/
         function showFrame(path,nodeId,name) {
-            // iframe
-            $('.iframe').hide();
             nodeId = nodeId.replace(/\./,'_');
-            let id = 'iframe_' + nodeId;
-            let iframe = Ext.getCmp(id);
+            let iframe_id_v = 'iframe_' + nodeId;
+            let tab_id_v = 'tab_' + nodeId;
+            let tab = Ext.getCmp(tab_id_v);
 
-            if(iframe) {
-                iframe.show();
-                $('#div_btn_' + nodeId).addClass('div_btn_choose');
+            var tabPanel = Ext.getCmp('tabPanel');
+            if(tab) {
+                tabPanel.setActiveTab(tab);
             } else {
-                var tabPanel = Ext.getCmp('tabPanel');
-
                 tabPanel.add({
-                     id : 'mywork',
-                     xtype : 'tabpanel',
-                     title : '欢迎使用客户关系管理系统',
-                     autoLoad : {
-                         url : '/index?pathKey=' + path,
-                         scripts : true
-                     }
-              });
-
-
-<!--                $('#tab_div').append("<div id='div_btn_" + nodeId + "' bindId ='" + id + "' class='div_btn div_btn_choose' title='" + path + "' onclick='showFrame_(this)'>" + name + "</div>");-->
-<!--                $('#content').append('<iframe id="' + id + '" class="iframe" frameborder="0" src="/index?pathKey=' + path + '" width="100%"></iframe>');-->
+                     id : tab_id_v,
+                     closable:true, tabTip:path, title : name,
+                     html: '<iframe id="' + iframe_id_v + '" class="iframe" frameborder="0" src="/index?pathKey=' + path + '" width="100%" ></iframe>'
+                });
+                let tab = Ext.getCmp(tab_id_v);
+                tabPanel.setActiveTab(tab);
+                autoAdjust();
             }
+        }
+        // 调整UI
+        function autoAdjust(){
+            let height = ($(window).height() - 100) + 'px';
+            $('iframe').attr('height', height);
+            $('.column-left').css('height', height);
         }
     </script>
 </head>
@@ -162,7 +181,7 @@
 </div>
 
 <div id="center1" class="x-hide-display">
-    <p><b>Done reading me? Close me by clicking the X in the top right corner.</b></p>
+    <p><h1>Hello world!</h1></p>
 </div>
 </body>
 </html>

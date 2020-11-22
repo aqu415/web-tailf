@@ -4,60 +4,165 @@
     <meta charset="UTF-8">
     <title>服务器管理</title>
     <link rel="stylesheet" th:href="@{/js/extjs/resources/css/ext-all.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/zTreeStyle.css}" type="text/css">
+
     <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.ztree.core.min.js}"></script>
     <script type="text/javascript" th:src="@{/js/extjs/ext-all.js}"></script>
     <script>
         Ext.onReady(function() {
-        Ext.state.Manager.setProvider(Ext.create('Ext.state.CookieProvider'));
+            Ext.state.Manager.setProvider(Ext.create('Ext.state.CookieProvider'));
 
-        var viewport = Ext.create('Ext.Viewport', {
-            id: 'border-example',
-            layout: 'border',
-            items: [
-            // create instance immediately
-            Ext.create('Ext.Component', {
-                region: 'north',
-                height: 32, // give north and south regions a height
-                autoEl: {
-                    tag: 'div',
-                    html:'日志查看系统'
-                }
-            }), {
-                region: 'west',
-                collapsible: true,
-                title: 'Starts at width 30%',
-                split: true,
-                width: '10%',
-                minWidth: 100,
-                stateId: 'westRegion',
-                stateful: true,
-                html: '<div>west<br>I am floatable and stateful!</div>'
-            },
-            // in this instance the TabPanel is not wrapped by another panel since no title is needed, this Panel is added directly as a Container
-            Ext.create('Ext.tab.Panel', {
-                region: 'center', // a center region is ALWAYS required for border layout
-                deferredRender: false,
-                activeTab: 0,     // first tab initially active
-                items: [{
-                    contentEl: 'center1',
-                    title: 'Close Me',
-                    closable: true,
-                    autoScroll: true
-                }]
-            })]
+            var viewport = Ext.create('Ext.Viewport', {
+                id: 'border-example',
+                layout: 'border',
+                items: [
+                // create instance immediately
+                Ext.create('Ext.Component', {
+                    region: 'north',
+                    height: 32, // give north and south regions a height
+                    autoEl: {
+                        tag: 'div',
+                        html:'日志查看系统'
+                    }
+                }), {
+                    region: 'west',
+                    collapsible: true,
+                    title: '服务器日志路径',
+                    split: true,
+                    width: '10%',
+                    minWidth: 100,
+                    stateId: 'westRegion',
+                    stateful: true,
+                    contentEl: 'west'
+                },
+                // in this instance the TabPanel is not wrapped by another panel since no title is needed, this Panel is added directly as a Container
+                Ext.create('Ext.tab.Panel', {
+                    id:'tabPanel',
+                    region: 'center', // a center region is ALWAYS required for border layout
+                    deferredRender: false,
+                    activeTab: 0,     // first tab initially active
+                    items: [{
+                        contentEl: 'center1',
+                        title: 'Close Me',
+                        closable: true,
+                        autoScroll: true
+                    }]
+                })]
+            });
+
+            /**初始化树*/
+            $(function(){
+                initTree();
+            });
         });
-    });
+
+        /**初始化树*/
+        var zTreeObj;
+        function initTree() {
+            // zTree 的参数配置，深入使用请参考 API 文档（http://www.treejs.cn/v3/main.php#_zTreeInfo）
+            var setting = {
+                callback:{onClick: zTreeClick,onExpand: zTreeExpand}
+            };
+            zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, getRootNodes());
+        }
+            /**获得根元素*/
+        function getRootNodes(){
+            let arr = [];
+            let cur = $('#path_config').val();
+            if (cur) {
+                let all = cur.split(';');
+                for (let i in all) {
+                    let item = all[i];
+                    let node = {};
+                    node.name = item;
+                    node.path = item;
+                    node.open = false;
+                    node.isParent = true;
+                    node.id = 'P_' + Math.random() * 100;
+                    arr.push(node);
+                }
+            }
+            return arr;
+        }
+
+        /**点击事件*/
+        function zTreeClick(tree, treeDOMId, node){
+            if(!node.children){
+                getNodeByParam(node);
+            }
+            let nodeId = node.id;
+            zTreeObj.expandNode(zTreeObj.getNodeByParam("id", nodeId));//展开指定节点
+            let path = node.path;
+            let name = node.name;
+            if(!node.isParent && (endWith(path,'.log') || endWith(path,'.txt'))){
+                showFrame(path,nodeId,name);
+            }
+        }
+
+        function endWith(src,str){
+          var reg = new RegExp(str + "$");
+          return reg.test(src);
+        }
+
+        /**展开事件*/
+        function zTreeExpand(tree, treeDOMId, node){
+            if(!node.children){
+                getNodeByParam(node);
+            }
+        }
+
+        /**根据参数获得路径*/
+        function getNodeByParam(node){
+            $.get('/path?key=' + node.path, function(data){
+                let data_ = JSON.parse(data);
+                for(i in data_){
+                    let item = data_[i];
+                    item.id = 'P_' + Math.random() * 100;
+                    zTreeObj.addNodes(node, item, true);
+                }
+            });
+        }
+
+        /***加载frame*/
+        function showFrame(path,nodeId,name) {
+            // iframe
+            $('.iframe').hide();
+            nodeId = nodeId.replace(/\./,'_');
+            let id = 'iframe_' + nodeId;
+            let iframe = Ext.getCmp(id);
+
+            if(iframe) {
+                iframe.show();
+                $('#div_btn_' + nodeId).addClass('div_btn_choose');
+            } else {
+                var tabPanel = Ext.getCmp('tabPanel');
+
+                tabPanel.add({
+                     id : 'mywork',
+                     xtype : 'tabpanel',
+                     title : '欢迎使用客户关系管理系统',
+                     autoLoad : {
+                         url : '/index?pathKey=' + path,
+                         scripts : true
+                     }
+              });
+
+
+<!--                $('#tab_div').append("<div id='div_btn_" + nodeId + "' bindId ='" + id + "' class='div_btn div_btn_choose' title='" + path + "' onclick='showFrame_(this)'>" + name + "</div>");-->
+<!--                $('#content').append('<iframe id="' + id + '" class="iframe" frameborder="0" src="/index?pathKey=' + path + '" width="100%"></iframe>');-->
+            }
+        }
     </script>
 </head>
 <body>
-<!-- use class="x-hide-display" to prevent a brief flicker of the content -->
+<input id='path_config' th:value="${path}" type="hidden">
 <div id="west" class="x-hide-display">
-    <p>Hi. I'm the west panel.</p>
+    <ul id="treeDemo" class="ztree"></ul>
 </div>
 
 <div id="center1" class="x-hide-display">
     <p><b>Done reading me? Close me by clicking the X in the top right corner.</b></p>
 </div>
-
 </body>
 </html>

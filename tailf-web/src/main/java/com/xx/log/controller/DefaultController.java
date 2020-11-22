@@ -26,7 +26,8 @@ public class DefaultController {
     @RequestMapping("/manage")
     public String manage(Model model) {
         // 查询所有有心跳的服务端
-        List<Slave> slaveList = new ArrayList<>();
+        String keys = String.join(";", logProperties.getPath().keySet());
+        model.addAttribute("path", keys);
         return "manage";
     }
 

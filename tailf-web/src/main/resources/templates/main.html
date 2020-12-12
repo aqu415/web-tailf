@@ -4,11 +4,12 @@
     <meta charset="UTF-8"/>
     <title>Web tailf</title>
     <link rel="shortcut icon" type="image/x-icon" th:href="@{/static/img/favicon.ico}">
-    <link rel="stylesheet" th:href="@{/css/zTreeStyle.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/ztree/metroStyle/metroStyle.css}" type="text/css">
     <link rel="stylesheet" th:href="@{/css/main.css}" type="text/css">
 
     <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
     <script type="text/javascript" th:src="@{/js/jquery.ztree.core.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/main.js}"></script>
     <script>
         $(function() {
             /**初始化菜单*/
@@ -17,6 +18,11 @@
             setInterval(function() {
                 autoAdjust();
             }, 1000);
+
+            $('.resize-bar').resize(function(){
+                let width = $(this).width();
+                setCookie('div_width',width);
+            });
         });
 
         // 调整UI
@@ -30,20 +36,28 @@
         var zTreeObj;
         function initTree() {
             // zTree 的参数配置，深入使用请参考 API 文档（http://www.treejs.cn/v3/main.php#_zTreeInfo）
-            var setting = {
-                    callback:{onClick: zTreeClick,onExpand: zTreeExpand}
+            let setting = {
+                    callback:{onClick: zTreeClick,onExpand: zTreeExpand},
+                view: {
+                    addDiyDom: addDiyDom
+                }
             };
             zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, getRootNodes());
-
             // 展开第一个节点
             openTree();
+        }
+
+        /**添加按钮*/
+        function addDiyDom(treeId, treeNode){
+            let aObj = $("#" + treeNode.tId + "_a");
+            aObj.after("<a href='javascript:void(0);' onclick='alert(1);'>下载</a>");
         }
 
         /**展开第一个节点*/
         function openTree(){
             setTimeout(function(){
-                var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
-                var nodes = treeObj.getNodes();
+                let treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+                let nodes = treeObj.getNodes();
                 if (nodes.length>0) {
                     getNodeByParam(nodes[0]);
                     treeObj.expandNode(nodes[0], true, true, true);
@@ -111,6 +125,8 @@
         /**初始化菜单*/
         function initView() {
             $('.tab_item').remove();
+            let div_width = getCookie('div_width');
+            $('.resize-bar').css("width",div_width + 'px');
         }
 
         /***加载frame*/
@@ -156,7 +172,7 @@
 <body style="font: 13px/21px Arial, sans-serif">
     <div class="column">
         <div class="column-left">
-            <div class="resize-bar"></div>
+            <div class="resize-bar" style="width: 300px;"></div>
             <div class="resize-line"></div>
             <div class="resize-save">
                 <ul id="treeDemo" class="ztree"></ul>

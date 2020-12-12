@@ -100,7 +100,7 @@
         function getNodeByParam(node){
             $.get('/path?key=' + node.path, function(data){
                 let data_ = JSON.parse(data);
-                for(i in data_){
+                for(let i in data_){
                     let item = data_[i];
                     item.id = 'P_' + Math.random() * 100;
                     zTreeObj.addNodes(node, item, true);

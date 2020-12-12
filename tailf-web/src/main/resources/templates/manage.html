@@ -2,7 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>服务器管理</title>
+    <title>Web tailf</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/static/img/favicon.ico}">
     <link rel="stylesheet" th:href="@{/js/extjs/resources/css/ext-all.css}" type="text/css">
     <link rel="stylesheet" th:href="@{/css/zTreeStyle.css}" type="text/css">
 
@@ -23,7 +24,7 @@
                     height: 32, // give north and south regions a height
                     autoEl: {
                         tag: 'div',
-                        html:'日志查看系统'
+                        html:'<center><h4>HELLO LOG!</h4></center>'
                     }
                 }), {
                     region: 'west',
@@ -42,12 +43,7 @@
                     region: 'center', // a center region is ALWAYS required for border layout
                     deferredRender: false,
                     activeTab: 0,     // first tab initially active
-                    items: [{
-                        contentEl: 'center1',
-                        title: 'Close Me',
-                        closable: true,
-                        autoScroll: true
-                    }]
+                    items: []
                 })]
             });
 
@@ -75,7 +71,7 @@
             };
             zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, getRootNodes());
         }
-            /**获得根元素*/
+        /**获得根元素*/
         function getRootNodes(){
             let arr = [];
             let cur = $('#path_config').val();
@@ -159,7 +155,7 @@
                 tabPanel.add({
                      id : tab_id_v,
                      closable:true, tabTip:path, title : name,
-                     html: '<iframe id="' + iframe_id_v + '" class="iframe" frameborder="0" src="/index?pathKey=' + path + '" width="100%" ></iframe>'
+                     html: '<iframe id="' + iframe_id_v + '" class="iframe" frameborder="0" src="/index?pathKey=' + path + '" width="100%" scrolling="auto"></iframe>'
                 });
                 let tab = Ext.getCmp(tab_id_v);
                 tabPanel.setActiveTab(tab);
@@ -176,7 +172,7 @@
 </head>
 <body>
 <input id='path_config' th:value="${path}" type="hidden">
-<div id="west" class="x-hide-display">
+<div id="west" class="x-hide-display column-left">
     <ul id="treeDemo" class="ztree"></ul>
 </div>
 

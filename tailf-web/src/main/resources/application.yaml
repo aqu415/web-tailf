@@ -9,4 +9,4 @@ spring:
 
 # 第一次加载默认展示的日志行数
 log-config:
-  defaultShowLineNum: 20
+  defaultShowLineNum: 50

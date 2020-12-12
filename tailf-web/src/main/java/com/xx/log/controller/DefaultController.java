@@ -28,7 +28,7 @@ public class DefaultController {
         // 查询所有有心跳的服务端
         String keys = String.join(";", logProperties.getPath().keySet());
         model.addAttribute("path", keys);
-        return "manage";
+        return "main";
     }
 
     /**

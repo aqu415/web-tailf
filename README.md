@@ -4,4 +4,4 @@
 
 提交在github(https://github.com/aqu415/tailf)
 
-再同步到码云
+再同步到码云(https://gitee.com/aqu415/tailf)

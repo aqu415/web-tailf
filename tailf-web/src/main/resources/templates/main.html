@@ -51,10 +51,15 @@
         function addDiyDom(treeId, treeNode){
             let aObj = $("#" + treeNode.tId + "_a");
             if(!treeNode.isParent && enableView(treeNode.path)){
-                aObj.after("<a href='javascript:void(0);' onclick='alert(1);'><img src='/img/download.png' style='width: 16px;' title='下载'></a>");
+                aObj.after("<a href='javascript:void(0);' onclick='download_(this)'><img abs='" + treeNode.path + "' src='/img/download.png' style='width: 16px;' title='下载'></a>");
             }
         }
 
+        function download_(obj){
+            let abs = $(obj).find('img').attr('abs');
+            console.log(abs);
+            window.open("dl?path=" + encodeURI(abs));
+        }
         /**展开第一个节点*/
         function openTree(){
             setTimeout(function(){
@@ -102,6 +107,7 @@
                 let data_ = JSON.parse(data);
                 for(let i in data_){
                     let item = data_[i];
+                    console.log(item);
                     item.id = 'P_' + Math.random() * 100;
                     zTreeObj.addNodes(node, item, true);
                 }

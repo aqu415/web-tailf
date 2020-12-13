@@ -106,7 +106,6 @@
                 let data_ = JSON.parse(data);
                 for(let i in data_){
                     let item = data_[i];
-                    console.log(item);
                     item.id = 'P_' + Math.random() * 100;
                     zTreeObj.addNodes(node, item, true);
                 }

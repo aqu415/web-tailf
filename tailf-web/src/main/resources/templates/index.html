@@ -13,10 +13,10 @@
     <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
     <script>
         $(function () {
-            var pathKey = $('#pathKey').val();
+            let pathKey = $('#pathKey').val();
             if ('WebSocket' in window) {
-                var url = 'ws://' + window.location.host + '/websocket01';
-                var sock = new WebSocket(url);      //打开WebSocket
+                let url = 'ws://' + window.location.host + '/websocket01';
+                let sock = new WebSocket(url);      //打开WebSocket
                 sock.onopen = function () {          //处理连接开启事件
                     let obj = {};
                     obj.cmd='bind';
@@ -49,7 +49,7 @@
         });
     </script>
 </head>
-<body style="font: 13px/21px Arial,sans-serif;overflow: scroll;">
+<body style="font: 13px/21px Arial,sans-serif;">
 <input th:value="${pathKey}" id="pathKey" type="hidden">
 <span id='anchor'></span>
 </body>

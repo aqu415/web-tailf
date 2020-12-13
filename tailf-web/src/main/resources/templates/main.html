@@ -57,8 +57,7 @@
 
         function download_(obj){
             let abs = $(obj).find('img').attr('abs');
-            console.log(abs);
-            window.open("dl?path=" + encodeURI(abs));
+            window.open("/dl?path=" + encodeURI(abs));
         }
         /**展开第一个节点*/
         function openTree(){
@@ -193,7 +192,7 @@
         <div class="column-right">
             <div style="height: 42px;overflow:auto;" id="tab_div"></div>
             <hr>
-            <div id="content" style="border: 1px solid #aba094;"></div>
+            <div id="content" style="border-left: 1px solid #aba094;"></div>
         </div>
     </div>
 </body>

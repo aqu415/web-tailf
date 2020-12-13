@@ -23,7 +23,7 @@ public class DefaultController {
      * @param response
      * @throws IOException
      */
-    @RequestMapping("dl")
+    @RequestMapping("/dl")
     public void download(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String path = request.getParameter("path");
         File file = new File(path);

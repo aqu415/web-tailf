@@ -7,21 +7,26 @@
     <link rel="stylesheet" th:href="@{/css/ztree/metroStyle/metroStyle.css}" type="text/css">
     <link rel="stylesheet" th:href="@{/css/main.css}" type="text/css">
 
-    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery-3.5.1.min.js}"></script>
     <script type="text/javascript" th:src="@{/js/jquery.ztree.core.min.js}"></script>
     <script type="text/javascript" th:src="@{/js/main.js}"></script>
+    <script type="text/javascript" th:src="@{/js/layer/layer.js}"></script>
     <script>
         $(function() {
             /**初始化菜单*/
             initView();
             initTree();
-            setInterval(function() {
-                autoAdjust();
-            }, 1000);
 
             $('.resize-bar').resize(function(){
                 let width = $(this).width();
                 setCookie('div_width',width);
+            });
+
+            $('#config_btn').click(function (){
+                layer.open({
+                    title: '在线调试'
+                    ,content: '可以填写任意的layer代码'
+                });
             });
         });
 
@@ -33,7 +38,7 @@
         }
 
         /**初始化树*/
-        var zTreeObj;
+        let zTreeObj;
         function initTree() {
             // zTree 的参数配置，深入使用请参考 API 文档（http://www.treejs.cn/v3/main.php#_zTreeInfo）
             let setting = {
@@ -180,9 +185,10 @@
 </head>
 <input id='path_config' th:value="${path}" type="hidden">
 <body style="font: 13px/21px Arial, sans-serif">
+    <input type="button" value="配置" id="config_btn">
     <div class="column">
         <div class="column-left">
-            <div class="resize-bar" style="width: 300px;"></div>
+            <div class="resize-bar" style="width: 300px;min-width: 50px;"></div>
             <div class="resize-line"></div>
             <div class="resize-save">
                 <ul id="treeDemo" class="ztree"></ul>

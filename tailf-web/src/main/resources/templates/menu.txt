@@ -1,6 +1,0 @@
-[
-    {id: "user", text: "用户管理"},
-    {id: "lists", text: "Lists", pid: "user" },
-    {id: "datagrid", text: "DataGrid", pid: "lists"},
-    {id: "tree", text: "Tree" , pid: "lists"}
-]

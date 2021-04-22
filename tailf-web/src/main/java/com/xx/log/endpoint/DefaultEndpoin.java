@@ -1,16 +1,5 @@
 package com.xx.log.endpoint;
 
-import java.net.InetSocketAddress;
-
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
-
-import org.springframework.stereotype.Component;
-
 import com.alibaba.fastjson.JSONObject;
 import com.xx.log.cmd.handler.BindContext;
 import com.xx.log.cmd.handler.CmdHandler;
@@ -18,9 +7,17 @@ import com.xx.log.cmd.type.BindPathCmd;
 import com.xx.log.session.SessionContext;
 import com.xx.log.util.SessionUtil;
 import com.xx.log.util.SpringUtil;
+import io.undertow.websockets.jsr.UndertowSession;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import javax.websocket.*;
+import javax.websocket.server.ServerEndpoint;
+import java.net.InetSocketAddress;
 
 @ServerEndpoint(value = "/websocket01")
 @Component
+@Slf4j
 public class DefaultEndpoin {
 
     /**
@@ -35,17 +32,23 @@ public class DefaultEndpoin {
         if (host != null) {
             SessionContext.register(host, session);
         }
-        System.out.println("Open");
+        log.info("Open:" + host);
     }
 
     /**
-     * 获得host,端口
+     * 获得host,端口等(会话唯一标记)
+     *
      * @param session
      * @return
      */
     private String getHost(Session session) {
-        InetSocketAddress fieldInstance = (InetSocketAddress) SessionUtil.getFieldInstance(session.getAsyncRemote(), "base#socketWrapper#socket#sc#remoteAddress");
-        return fieldInstance.toString();
+        if (session instanceof UndertowSession) {
+            UndertowSession undertowSession = (UndertowSession) session;
+            return undertowSession.getId();
+        } else {
+            InetSocketAddress fieldInstance = (InetSocketAddress) SessionUtil.getFieldInstance(session.getAsyncRemote(), "base#socketWrapper#socket#sc#remoteAddress");
+            return fieldInstance.toString();
+        }
     }
 
 
@@ -56,9 +59,9 @@ public class DefaultEndpoin {
      */
     @OnClose
     public void onClose(Session session) throws Exception {
-        System.out.println("Close");
         String host = this.getHost(session);
         com.xx.log.session.SessionContext.unRegister(host);
+        log.info("close:" + host);
     }
 
     /**
@@ -71,16 +74,14 @@ public class DefaultEndpoin {
     @OnMessage
     public void onMessage(String message, Session session) throws Exception {
         if (message != null) {
-            System.out.println("接收到数据" + message);
+            log.info("接收到数据:" + message);
         } else {
             return;
         }
         String host = this.getHost(session);
         if (host != null) {
-        	// 欢迎信息
-        	session.getBasicRemote().sendText("hello this is server;");
-        	
-        	// bind
+
+            // bind
             if (message.contains("bind")) {
                 BindPathCmd cmd = JSONObject.parseObject(message, BindPathCmd.class);
                 cmd.setHost(host);
@@ -108,6 +109,4 @@ public class DefaultEndpoin {
         }
         error.printStackTrace();
     }
-
-
 }

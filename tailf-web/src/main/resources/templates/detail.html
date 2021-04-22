@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Web tailf</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/static/img/favicon.ico}">
+    <style type="text/css">
+    pre {
+      margin: 0px;
+    }
+    </style>
+    <script type="text/javascript" th:src="@{/js/jquery-1.12.4.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/tailf-main.js}"></script>
+    <script>
+
+        /**滚动*/
+        function scroll_(){
+            $('#anchor')[0].scrollIntoView();
+        }
+
+        /**获得当前展示的文件绝对路径*/
+        function getAbsPath(){
+            return $('#pathKey').val();
+        }
+
+
+        /***页面展示上一次搜索的内容*/
+        function fillSearchInput(){
+            let search_cookie_key = getAbsPath();
+            search_cookie_key = escape(search_cookie_key);
+            let search_cookie_value = getCookie(search_cookie_key);
+            if(search_cookie_value){
+                $('#search_').val(search_cookie_value);
+            }
+        }
+
+        /**获得模糊搜索的内容*/
+        function getSearchTag(){
+            return $('#search_').val();
+        }
+
+        /**刷新搜索内容cookie*/
+        function freshCookie_(){
+            let search_cookie_key = getAbsPath();
+            search_cookie_key = escape(search_cookie_key);
+            let search_cookie_value = getSearchTag();
+            if(search_cookie_value){
+                setCookie(search_cookie_key, search_cookie_value);
+            } else {
+                setCookie(search_cookie_key, '');
+            }
+        }
+
+
+        $(function () {
+
+            /**初始化socket对象*/
+            initSocket();
+
+            /**页面去除多余的行*/
+            setInterval(function () {
+                let all = $('.p').length;
+                if (all > 800) {
+                	let threshold = parseInt(Number(all) * 0.9);
+                    $('.p:lt(' + threshold + ')').remove();
+                }
+            }, 1000);
+
+            /**从cookie获得上一次搜索的内容*/
+            fillSearchInput();
+        });
+
+        /**清空搜索cookie*/
+        function clearSearch(){
+            $('#search_').val('');
+            freshCookie_();
+        }
+
+        /***手动搜索*/
+        function search(){
+            if(sock){
+                $('.p').remove();
+                sock.close();
+                /***重新创建一个socket*/
+                initSocket();
+            }
+        }
+
+        let sock;
+        function initSocket(){
+            let pathKey = getAbsPath();
+            if ('WebSocket' in window) {
+                let url = 'ws://' + window.location.host + '/websocket01';
+                sock = new WebSocket(url);      //打开WebSocket
+                sock.onopen = function () {          //处理连接开启事件
+                    let obj = {};
+                    obj.cmd='bind';
+                    obj.pathKey = pathKey;
+                    obj.searchKey = getSearchTag()
+                    sock.send(JSON.stringify(obj));
+                };
+
+                sock.onmessage = function (e) {      //处理信息
+                    e = e || event; 		         //获取事件，这样写是为了兼容IE浏览器
+                    freshCookie_();
+                    let data = e.data;
+                    let search_ = $('#search_').val();
+                    if(data.indexOf(search_) > -1){
+                        $('#anchor').before("<pre class='p' style='display: block;'>" + data + "</pre>");
+                        scroll_();
+                    }
+                };
+
+                sock.onclose = function () {         //处理连接关闭事件
+                    console.log('onclose');
+                };
+
+            } else {
+                alert("你的浏览器不支持WebSocket");
+            }
+        }
+    </script>
+</head>
+
+<body style="font: 13px/21px Arial,sans-serif;">
+<div style="position: fixed;left: 0px;top: 0px;">
+    <span style="background-color: #8c8c8c;">请输入过滤内容：</span>
+    <input id="search_" autocomplete="off" onblur="freshCookie_()">
+    <input type="button" value="清空" onclick="clearSearch()">
+    <input type="button" value="搜索" onclick="search()">
+</div>
+<input th:value="${pathKey}" id="pathKey" type="hidden">
+
+<div style="margin-top: 20px;clear: both;">
+    <span id='anchor'></span>
+</div>
+
+</body>
+</html>

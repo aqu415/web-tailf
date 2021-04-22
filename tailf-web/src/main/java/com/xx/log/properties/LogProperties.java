@@ -24,4 +24,7 @@ public class LogProperties {
 
 	/**默认显示的文件行数**/
 	private int defaultShowLineNum;
+
+	/**日志路径*/
+	private String monitorPath;
 }

@@ -1,0 +1,9 @@
+com\xx\log\pojo\Master.class
+com\xx\log\pojo\ExtPath.class
+com\xx\log\pojo\Slave.class
+com\xx\log\enums\Enums.class
+com\xx\log\enums\Enums$Role.class
+com\xx\log\pojo\Path$PathBuilder.class
+com\xx\log\pojo\Path.class
+com\xx\log\pojo\ExtPath$ExtPathBuilder.class
+com\xx\log\pojo\Host.class

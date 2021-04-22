@@ -23,8 +23,8 @@ public class Agent {
     	// 当前文件
     	File current = new File(file);
     	
-        // 轮询间隔 5 秒
-        long interval = TimeUnit.SECONDS.toMillis(3);
+        // 轮询间隔（s）
+        long interval = TimeUnit.SECONDS.toMillis(1);
         
         // 创建过滤器
         IOFileFilter directories = FileFilterUtils.and(FileFilterUtils.directoryFileFilter(), HiddenFileFilter.VISIBLE);

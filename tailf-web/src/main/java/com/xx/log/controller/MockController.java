@@ -27,49 +27,6 @@ import com.xx.log.session.SessionContext;
 @RestController
 public class MockController {
 
-	@Resource
-	private LogProperties logProperties;
-	
-	/**
-	 * 获得子目录、文件
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = "/path")
-	public String getChildren(HttpServletRequest request) {
-		
-		String key = request.getParameter("key");
-		if(logProperties.getPath().containsKey(key)) {
-			key = logProperties.getPath().get(key);
-		}
-		
-		ArrayList<Path> list = this.getPath(key);
-		list.sort(Comparator.reverseOrder());
-		return JSONObject.toJSONString(list);
-	}
-	
-	/**
-	 * 获得子目录或者文件
-	 * @param pathStr
-	 * @return
-	 */
-	private ArrayList<Path> getPath (String pathStr){
-		ArrayList<Path> list = new ArrayList<Path>();
-		File file = new File(pathStr);
-		if(file.exists() && file.isDirectory()) {
-			File[] listFiles = file.listFiles();
-			for(File f : listFiles) {
-				Path path = Path.builder()
-						.name(f.getName())
-						.path(f.getAbsolutePath().replace("\\", "/"))
-						.isParent(String.valueOf(f.isDirectory()))
-						.build();
-				list.add(path);
-			}
-		}
-		return list;
-	}
-	
     /**
      * mockSend
      *

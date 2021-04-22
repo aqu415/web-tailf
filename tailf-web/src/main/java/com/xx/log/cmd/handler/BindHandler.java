@@ -25,21 +25,22 @@ public class BindHandler implements CmdHandler {
         BindPathCmd bindPathCmd = (BindPathCmd) baseCmd;
 
         File file = new File(bindPathCmd.getPathKey());
-        
-        // 注册host-路径关系
-        SessionContext.subscribe(bindPathCmd.getHost(), file.getAbsolutePath());
+
+        // 注册客户端、文件绝对路径、搜索关键字之间的关系
+        SessionContext.subscribe(bindPathCmd.getHost(), file.getAbsolutePath(), bindPathCmd.getSearchKey());
 
         //监听目录(幂等)
         MonitorContext.register(bindPathCmd.getPathKey());
-        
+
         try {
-        	// 获得文件最后几行内容
-			String lastContent = ContentUtil.readLastRows(bindPathCmd.getPathKey(), logProperties.getDefaultShowLineNum());
-			bindPathCmd.getSession().getBasicRemote().sendText(lastContent);
-			// 记录内容读取偏移量
-			MonitorContext.setOffset(file.getAbsolutePath(), file.length());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+            // 获得文件最后n行内容
+            String lastContent = ContentUtil.readLastRows(bindPathCmd.getPathKey(), logProperties.getDefaultShowLineNum(),
+                    bindPathCmd.getSearchKey());
+            bindPathCmd.getSession().getBasicRemote().sendText(lastContent);
+            // 记录内容读取偏移量
+            MonitorContext.setOffset(file.getAbsolutePath(), file.length());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

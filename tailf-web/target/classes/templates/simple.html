@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Web tailf</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/ztree/metroStyle/metroStyle.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/main.css}" type="text/css">
+
+    <script type="text/javascript" th:src="@{/js/jquery-1.12.4.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/tailf-main.js}"></script>
+    <script type="text/javascript" th:src="@{/js/tailf-aboutTree.js}"></script>
+    <script type="text/javascript" th:src="@{/ztree/jquery.ztree.core.min.js}"></script>
+    <script>
+        $(function() {
+            /**初始化菜单*/
+            initView();
+            initTree();
+
+            $('.resize-bar').resize(function(){
+                let width = $(this).width();
+                setCookie('div_width',width);
+            });
+        });
+
+        // 调整UI
+        function autoAdjust(){
+            let height = ($(window).height() - 100) + 'px';
+            $('iframe').attr('height', height);
+            $('.column-left').css('height', height);
+        }
+
+        /**初始化树*/
+        let zTreeObj;
+        function initTree() {
+            // zTree 的参数配置，深入使用请参考 API 文档（http://www.treejs.cn/v3/main.php#_zTreeInfo）
+            let setting = {
+                    callback:{onClick: zTreeClick,onExpand: zTreeExpand},
+                view: {
+                    addDiyDom: addDiyDom
+                }
+            };
+            zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, getRootNodes());
+            // 展开第一个节点
+            openTree();
+            autoAdjust();
+        }
+
+        /**添加按钮*/
+        function addDiyDom(treeId, treeNode){
+            let aObj = $("#" + treeNode.tId + "_a");
+            if(!treeNode.isParent && (enableView(treeNode.path) || endWith(treeNode.path,'.gz')) ){
+                aObj.after("<a href='javascript:void(0);' onclick='download_(this)'><img abs='" + treeNode.path + "' src='/img/download.png' style='width: 16px;' title='下载'></a>");
+            }
+        }
+
+        function download_(obj){
+            let abs = $(obj).find('img').attr('abs');
+            window.open("/dl?path=" + encodeURI(abs));
+        }
+
+        /**点击事件*/
+        function zTreeClick(tree, treeDOMId, node){
+            if(!node.children){
+                getNodeByParam(node);
+            }
+            let nodeId = node.id;
+            zTreeObj.expandNode(zTreeObj.getNodeByParam("id", nodeId));//展开指定节点
+            let path = node.path;
+            let name = node.name;
+            if(!node.isParent && enableView(path)){
+                showFrame(path,nodeId,name);
+            }
+        }
+
+        /**展开事件*/
+        function zTreeExpand(tree, treeDOMId, node){
+            if(!node.children){
+                getNodeByParam(node);
+            }
+        }
+
+        /**初始化菜单*/
+        function initView() {
+            $('.tab_item').remove();
+            let div_width = getCookie('div_width');
+            if(div_width) {
+              $('.resize-bar').css("width", div_width + 'px');
+            } else {
+              $('.resize-bar').css("width", '300px');
+            }
+        }
+
+        /***加载frame*/
+        function showFrame(path,nodeId,name) {
+            // iframe
+            $('.iframe').hide();
+            nodeId = nodeId.replace(/\./,'_');
+            let id = 'iframe_' + nodeId;
+            let iframe = $('#' + id);
+            let iframeLength = iframe.length;
+
+            //div_btn
+            $('.div_btn').removeClass('div_btn_choose');
+
+            if(iframeLength > 0) {
+                showIframe_(iframe);
+                $('#div_btn_' + nodeId).addClass('div_btn_choose');
+            } else {
+                $('#tab_div').append("<div id='div_btn_" + nodeId + "' bindId ='" + id + "' class='div_btn div_btn_choose' title='" + path + "' onclick='showFrame_(this)'>" + name + "</div>");
+                $('#content').append('<iframe id="' + id + '" class="iframe" frameborder="0" src="/d?pathKey=' + path + '" width="100%"></iframe>');
+            }
+
+            // 调整UI
+            autoAdjust();
+        }
+
+        function showIframe_(iframe){
+            iframe.show();
+            iframe[0].contentWindow.scroll_();
+        }
+
+        /**按钮切换*/
+        function showFrame_(obj){
+            let tab = $(obj);
+            let iframeId = tab.attr('bindId');
+            let iframe = $('#' + iframeId);
+            if(iframe.length > 0){
+                $('.iframe').hide();
+                $('.div_btn').removeClass('div_btn_choose');
+
+                tab.addClass('div_btn_choose');
+                showIframe_(iframe);
+            }
+        }
+    </script>
+</head>
+<input id='path_config' th:value="${path}" type="hidden">
+<body style="font: 13px/21px Arial, sans-serif">
+    <div class="column">
+        <div class="column-left">
+            <div class="resize-bar" style="min-width: 100px;"></div>
+            <div class="resize-line"></div>
+            <div class="resize-save">
+                <ul id="treeDemo" class="ztree"></ul>
+            </div>
+        </div>
+        <div class="column-right">
+            <div style="height: 42px;overflow:auto;" id="tab_div"></div>
+            <hr>
+            <div id="content" style="border-left: 1px solid #aba094;"></div>
+        </div>
+    </div>
+</body>
+</html>

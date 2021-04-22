@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Web tailf</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/static/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/ext-4.2.1/resources/css/ext-all.css}" type="text/css">
+    <script type="text/javascript" th:src="@{/ext-4.2.1/ext-all.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery-1.12.4.min.js}"></script>
+    <script type="text/javascript" th:src="@{/ztree/jquery.ztree.core.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/tailf-aboutTree.js}"></script>
+
+    <script type="text/javascript">
+        Ext.require(['*']);
+
+        Ext.onReady(function () {
+
+                Ext.QuickTips.init();
+                Ext.state.Manager.setProvider(Ext.create('Ext.state.CookieProvider'));
+
+                /**数节点数据源*/
+                let tree_store_ = Ext.create('Ext.data.TreeStore', {
+                    proxy: {
+                        type: 'ajax',
+                        url: '/extPath',
+                        reader: {
+                            type: 'json',
+                            root: 'treeList'
+                        }
+                    },
+                    folderSort: true
+                });
+
+
+                /**左侧树结构*/
+                let tree_ = Ext.create('Ext.tree.Panel', {
+                    title: 'Simple Tree',
+                    region: 'center',
+                    store: tree_store_,
+                    useArrows: true,
+                    rootVisible: false,
+                    listeners: {'itemclick': treeItemClick, 'itemcontextmenu': itemContextMenu_}
+                });
+
+                /**显示右键菜单*/
+                function itemContextMenu_(obj, record, item, index, e) {
+                    //禁用浏览器的右键相应事件
+                    e.preventDefault();
+                    e.stopEvent();
+
+                    // 判断是否可以下载
+                    let oriId = record.data.id;
+                    if (!(endWith(oriId, '.log') || endWith(oriId, '.txt') || endWith(oriId, '.gz'))) {
+                        return;
+                    }
+
+                    // 初始化右键菜单
+                    let menu = new Ext.menu.Menu({
+                        id: 'theContextMenu',
+                        items: [{
+                            text: '下载文件',
+                            handler: function (item) {
+                                window.open("/dl?path=" + encodeURI(oriId));
+                            }
+                        }]
+                    });
+                    menu.showAt(e.getXY());
+                }
+
+                /**tab 点击展示*/
+                function itemShow(tabPanel, newCard, oldCard, eOpts) {
+                    laterScrollIframe(newCard.id)
+                }
+
+                function endWith(src, str) {
+                    let reg = new RegExp(str + "$");
+                    return reg.test(src);
+                }
+
+                /**点击树节点*/
+                function treeItemClick(panel, record, item, index, e, eOpts) {
+                    // id 为展开节点时传到后台的node参数
+                    let ori_id = record.data.id;
+
+                    let leaf = record.data.leaf;
+                    let text = record.data.text;
+
+                    let flag = record.raw.flag;
+                    if (leaf) {
+                        if (!(endWith(ori_id, '.log') || endWith(ori_id, '.txt'))) {
+                            return;
+                        }
+
+                        let tab_item = Ext.getCmp(flag);
+                        let tab_panel = Ext.getCmp('tab_');
+                        if (!tab_item) {
+                            tab_item = {
+                                tbar: ['-',
+                                    {
+                                        xtype: 'button', text: '下载', listeners: {
+                                            'click': function () {
+                                                window.open("/dl?path=" + encodeURI(ori_id));
+                                            }
+                                        }
+                                    }, '-'
+                                ],
+                                title: text,
+                                id: flag,
+                                html: '<iframe id="F' + flag + '" frameborder="0" src="/d?pathKey=' + ori_id + '" width="100%" height="100%"></iframe>',
+                                closable: true
+                            };
+                            tab_panel.add(tab_item);
+                        }
+                        tab_panel.setActiveTab(flag);
+
+                        //自动滚动到底部
+                        laterScrollIframe(flag);
+                    }
+                }
+
+                function laterScrollIframe(id) {
+                    setTimeout(function () {
+                        let iframe = $('#F' + id);
+                        iframe[0].contentWindow.scroll_();
+                    }, 30)
+                }
+
+                let viewport = Ext.create('Ext.Viewport', {
+                    id: 'border-example',
+                    layout: 'border',
+                    items: [
+                        // create instance immediately
+                        Ext.create('Ext.Component', {
+                            region: 'north',
+                            height: 32, // give north and south regions a height
+                            autoEl: {
+                                tag: 'div',
+                                html: '<p>日志实时查看工具</p>'
+                            }
+                        }), {
+                            region: 'west',
+                            stateId: 'navigation-panel',
+                            id: 'west-panel', // see Ext.getCmp() below
+                            split: true,
+                            width: 200,
+                            minWidth: 175,
+                            margins: '0 0 0 5',
+                            layout: 'border',
+                            stateful: true,
+                            items: [tree_]
+                        },
+                        // in this instance the TabPanel is not wrapped by another panel since no title is needed, this Panel is added directly as a Container
+                        Ext.create('Ext.tab.Panel', {
+                            region: 'center', // a center region is ALWAYS required for border layout
+                            id: 'tab_',
+                            listeners: {'tabchange': itemShow}
+                        })]
+                });
+            }
+        );
+    </script>
+</head>
+<body>
+<input id='path_config' th:value="${path}" type="hidden">
+</body>
+</html>

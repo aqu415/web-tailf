@@ -8,9 +8,9 @@ import lombok.Data;
 public class Path implements Comparable<Path>{
 	
 	private String name;
-	
+
 	private String path;
-	
+
 	private String isParent;
 
 	@Override

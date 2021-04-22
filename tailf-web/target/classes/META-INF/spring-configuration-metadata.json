@@ -1,0 +1,31 @@
+{
+  "groups": [
+    {
+      "name": "log-config",
+      "type": "com.xx.log.properties.LogProperties",
+      "sourceType": "com.xx.log.properties.LogProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "log-config.default-show-line-num",
+      "type": "java.lang.Integer",
+      "description": "默认显示的文件行数",
+      "sourceType": "com.xx.log.properties.LogProperties",
+      "defaultValue": 0
+    },
+    {
+      "name": "log-config.monitor-path",
+      "type": "java.lang.String",
+      "description": "日志路径",
+      "sourceType": "com.xx.log.properties.LogProperties"
+    },
+    {
+      "name": "log-config.path",
+      "type": "java.util.HashMap<java.lang.String,java.lang.String>",
+      "description": "监听的路径",
+      "sourceType": "com.xx.log.properties.LogProperties"
+    }
+  ],
+  "hints": []
+}

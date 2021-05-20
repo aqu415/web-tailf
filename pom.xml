@@ -7,11 +7,11 @@
     <groupId>org.example</groupId>
     <artifactId>tailf</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.2.0-SNAPSHOT</version>
     <modules>
         <module>tailf-common</module>
-<!--        <module>tailf-server</module>-->
-        <module>tailf-client</module>
+        <module>tailf-monitor</module>
+        <module>tailf-remote</module>
         <module>tailf-web</module>
     </modules>
     <parent>
@@ -24,7 +24,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <project.dependency.version>${project.version}</project.dependency.version>
+        <revision>${project.version}</revision>
+        <netty-all.version>4.1.39.Final</netty-all.version>
     </properties>
 
     <dependencies>

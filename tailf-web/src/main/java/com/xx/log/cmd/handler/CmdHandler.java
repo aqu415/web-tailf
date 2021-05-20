@@ -1,7 +1,7 @@
 package com.xx.log.cmd.handler;
 
-import com.xx.log.cmd.type.BaseCmd;
+import com.xx.log.cmd.param.BaseParam;
 
 public interface CmdHandler {
-    void handleCMD(BaseCmd baseCmd);
+    void handleCMD(BaseParam baseParam);
 }

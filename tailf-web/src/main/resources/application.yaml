@@ -11,11 +11,22 @@ spring:
 logging:
   file:
     path: /log-tailf
+  level:
+    com.xx.log: debug
 
-log-config:
+tailf:
   # 第一次进入页面默认获取的日志行数
   default-show-line-num: 100
 
   # 监听目录，可以设置多个以 ; 隔开
-  monitor-path : d:/log;d:/log2
+  monitor-path: d:/log;d:/log2
+
+  # 当前应用的角色（master|slave）
+  web-role: master
+
+  # master netty IP（配置成内网IP,master-slave模式会使用该配置）
+  master-netty-host: 127.0.0.1
+
+  #master netty port（master-slave模式会使用该配置）
+  master-netty-port: 10085
 

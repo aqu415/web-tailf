@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>LOG Desktop</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" type="text/css" th:href="@{/ext-4.2.1/desktop/css/desktop.css}" />
+    <link rel="stylesheet" th:href="@{/ext-4.2.1/resources/css/ext-all.css}" type="text/css">
+    <script type="text/javascript" th:src="@{/ext-4.2.1/ext-all.js}"></script>
+    <!-- GC -->
+    <!-- <x-compile> -->
+    <!-- <x-bootstrap>
+    <script type="text/javascript" src="../../examples/shared/include-ext.js"></script>
+    <script type="text/javascript" src="../../examples/shared/options-toolbar.js"></script>
+    -->
+    <!-- </x-bootstrap> -->
+    <script type="text/javascript">
+        // 定义js加载路径
+        Ext.Loader.setPath({
+            'Ext.ux.desktop': '/ext-4.2.1/desktop/js',
+            'MyDesktop': '/ext-4.2.1/desktop'
+        });
+
+        // 引入 DesktopView.js
+        Ext.require('MyDesktop.DesktopView');
+
+        let myDesktopApp;
+        Ext.onReady(function () {
+            myDesktopApp = new MyDesktop.DesktopView();
+        });
+    </script>
+    <!-- </x-compile> -->
+</head>
+<body>
+
+</body>
+</html>

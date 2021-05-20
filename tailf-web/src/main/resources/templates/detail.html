@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
     <title>Web tailf</title>
-    <link rel="shortcut icon" type="image/x-icon" th:href="@{/static/img/favicon.ico}">
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
     <style type="text/css">
     pre {
       margin: 0px;
@@ -23,7 +22,6 @@
         function getAbsPath(){
             return $('#pathKey').val();
         }
-
 
         /***页面展示上一次搜索的内容*/
         function fillSearchInput(){

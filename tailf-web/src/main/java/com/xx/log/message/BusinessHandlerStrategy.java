@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
+/**
+ * 处理netty消息的策略
+ */
 @Component
 @Slf4j
 public class BusinessHandlerStrategy implements HandlerStrategy {

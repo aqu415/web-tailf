@@ -1,5 +1,7 @@
 package com.xx.log.session;
 
+import lombok.extern.slf4j.Slf4j;
+
 import javax.websocket.Session;
 import java.io.IOException;
 import java.util.*;
@@ -11,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2020.10.26 10:13
  * @since 1.6.0
  */
+@Slf4j
 public class SessionContext {
 
     /**
@@ -21,10 +24,6 @@ public class SessionContext {
     /*** 记录所有的连接 */
     private static Map<String/** host */, Session> allClient = new ConcurrentHashMap<>();
 
-    /**
-     * 存放每个客户端+文件对应的关键字
-     */
-    /*private static Map<String*//**host + path*//*, String*//**模糊搜索关键字*//*> clinetSearchKey = new ConcurrentHashMap<>();*/
 
     /**
      * 注册host,session
@@ -40,18 +39,8 @@ public class SessionContext {
      * @return
      */
     public synchronized static void subscribe(String host, String path, String searchKey) {
-        Set<String> hosts = subscription.get(path);
-        if (hosts == null) {
-            hosts = new HashSet<>();
-            subscription.put(path, hosts);
-        }
+        Set<String> hosts = subscription.computeIfAbsent(path, k -> new HashSet<>());
         hosts.add(host);
-
-        /*if (searchKey != null && searchKey.length() > 0) {
-            clinetSearchKey.put(host + path, searchKey);
-        } else {
-            clinetSearchKey.remove(host + path);
-        }*/
     }
 
     /*** 登出 */
@@ -63,24 +52,15 @@ public class SessionContext {
         subscription.values().forEach(set -> {
             set.remove(host);
         });
-
-        // 删除模糊搜索key
-        /*Iterator<String> iterator = clinetSearchKey.keySet().iterator();
-        while (iterator.hasNext()) {
-            String key = iterator.next();
-            if (key.contains(host)) {
-                clinetSearchKey.remove(key);
-            }
-        }*/
     }
 
     /*** 广播 */
     public static void sendMsg(String line) {
-        allClient.values().forEach((a) -> {
+        allClient.values().forEach((session) -> {
             try {
-                a.getBasicRemote().sendText(line);
+                session.getBasicRemote().sendText(line);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("广播通知客户端异常：", e);
             }
         });
     }
@@ -93,13 +73,17 @@ public class SessionContext {
         if (hosts != null) {
             hosts.forEach((host) -> {
                 Optional.ofNullable(allClient.get(host)).ifPresent((session) -> {
-                    try {
-                        session.getBasicRemote().sendText(line);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    sendMsg(session, line);
                 });
             });
+        }
+    }
+
+    public static void sendMsg(Session session, String msg) {
+        try {
+            session.getBasicRemote().sendText(msg);
+        } catch (IOException e) {
+            log.error("通知客户端异常：", e);
         }
     }
 }

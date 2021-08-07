@@ -14,7 +14,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 
-@Cmd(param = BindPath.class)
+@Cmd(param = BindPath.class, cmd = "bind")
 @Service
 @Slf4j
 public class BindHandler implements CmdHandler {
@@ -26,12 +26,11 @@ public class BindHandler implements CmdHandler {
     /**
      * 处理订阅目录请求
      *
-     * @param baseParam 目录参数
+     * @param baseParam
      */
     @Override
-    public void handleCMD(BaseParam baseParam) {
+    public void handleMessage(BaseParam baseParam) {
         BindPath bindPath = (BindPath) baseParam;
-
         File file = new File(bindPath.getPathKey());
 
         // 注册客户端、文件绝对路径、搜索关键字之间的关系

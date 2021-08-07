@@ -10,7 +10,7 @@ spring:
 # sl4j 打印相关配置
 logging:
   file:
-    path: /log-tailf
+    path: d:/log/tailf
   level:
     com.xx.log: debug
 
@@ -19,7 +19,7 @@ tailf:
   default-show-line-num: 100
 
   # 监听目录，可以设置多个以 ; 隔开
-  monitor-path: d:/log;d:/log2
+  monitor-path: D:/log/log01;D:/log/log02
 
   # 当前应用的角色（master|slave）
   web-role: master
@@ -30,3 +30,8 @@ tailf:
   #master netty port（master-slave模式会使用该配置）
   master-netty-port: 10085
 
+  # 自动部署时附件文件所在的目录
+  attachment-file-path: e:/repository/org/example/tailf-web/1.2.0-SNAPSHOT/
+
+  # 自动部署时附件文件的名称(注意：该配置要与上面的 attachment-file-path 能组成正确的文件路径)
+  attachment-file-name: tailf-web-1.2.0-SNAPSHOT.jar

@@ -9,18 +9,18 @@ import javax.websocket.Session;
 @EqualsAndHashCode(callSuper = false)
 public class BindPath extends BaseParam {
 
-    /**	 * serialVersionUID	 */
-	private static final long serialVersionUID = 1L;
-	
-	/**客户端IP*/
-	private String clientHost;
-	
-	/**绑定的路径*/
-    private String pathKey;
-    
-    /**当前webSocket session*/
-    private Session session;
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = 1L;
 
-    /**模糊搜索的内容*/
+    /**
+     * 绑定的路径
+     */
+    private String pathKey;
+    /**
+     * 模糊搜索的内容
+     */
     private String searchKey;
+
 }

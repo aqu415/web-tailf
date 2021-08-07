@@ -1,17 +1,20 @@
-package com.xx;
+package com.xx.log.test;
+
+import org.junit.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
-public class Test {
+public class FileTest {
 
-    @org.junit.Test
+    @Test
     public void dataTest() throws Exception {
         //写入中文字符时解决中文乱码问题
         FileOutputStream fos = new FileOutputStream(new File("D:\\log/新建文本文档 (2).txt"));
-        OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+        OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
         PrintWriter pw = new PrintWriter(osw);
 
         pw.println("welcome!");

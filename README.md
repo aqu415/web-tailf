@@ -1,21 +1,20 @@
 ## tailf
 
-一个类似linux tail的web版本日志查看工具
+一个类似linux tail的web版本日志滚动查看工具
 
-提交在github(https://github.com/aqu415/tailf)
+码云(https://gitee.com/aqu415/tailf)
 
-再同步到码云(https://gitee.com/aqu415/tailf)
+github同步(https://github.com/aqu415/tailf)
 
 CSDN(https://blog.csdn.net/Aqu415/article/details/114419320)
 
 ### 背景
 > 前一段时间由于项目原因，需要经常上服务器看日志；由于没有公共的页面查看与下载，就需要频繁的登录服务器，然后执行一堆命令，最后才能看到日志；
-> 这个过程太痛苦，网上搜了一圈没有合适的工具，于是自己写了一个简单的日志实时查看的工具，取名叫 Web-tailf
+> 这个过程太繁琐痛苦，网上搜了一圈没有合适的工具，于是自己写了一个简单的日志实时查看的工具；
 
 ### 原理
-> Websocket + FileAlterationListenerAdaptor
-> 
-> master与slave之间netty连接（重连逻辑未开发）
+1. Websocket + FileAlterationListenerAdaptor：通过监听文件变化，再增量获得变化的内容通过websocket发送给浏览器客户端
+2. 多服务器场景下master与slave之间netty连接（异常后重连逻辑未开发）
 
 ### gitee地址
 https://gitee.com/aqu415/tailf
@@ -28,7 +27,7 @@ https://gitee.com/aqu415/tailf
 5. 日志智能分析（未开发）
 
 ### 本地调试
-+ 本地调试如果需要监听多个目录可以通过以下配置，多个目录间以 ; 分隔
++ 本地调试如果需要监听多个目录可以通过以下配置，多个目录间以英文 ; 分隔
 + 然后执行 com.xx.log.LogApplication.main 方法即可本地启动;
 
 注：配置文件里的监听目录配置是默认配置，可被启动参数覆盖(如：IDE配置启动参数，或者打成jar包后用 jar 命令启动后的参数)
@@ -46,6 +45,8 @@ https://gitee.com/aqu415/tailf
 ```
 linux后台运行:
 nohup java -jar tailf-web-1.0-xxx.jar "/usr/logs/tomcat1" "/usr/logs/tomcat2" &
+or
+java -jar tailf-web-1.0-xxx.jar "/usr/logs/tomcat1" "/usr/logs/tomcat2" &
 
 windows窗口启动
 java -jar tailf-web-1.0-xxx.jar "/usr/logs/tomcat1" "/usr/logs/tomcat2"
@@ -61,7 +62,6 @@ java -jar tailf-web-1.0-xxx.jar "/usr/logs/tomcat1" "/usr/logs/tomcat2"
 在树节点上右键即可弹出下载菜单
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210420114237971.gif)
-
 
 ### master-slave模式
 如果有多台服务器需要进行日志查看，但是又不想记住多个服务器访问地址则可以使用master-slave模式，具体操作如下：

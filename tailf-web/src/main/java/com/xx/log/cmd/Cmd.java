@@ -10,5 +10,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface Cmd {
+    
     Class<? extends BaseParam> param();
+
+    String cmd();
 }

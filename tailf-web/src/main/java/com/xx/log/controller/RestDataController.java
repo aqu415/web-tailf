@@ -6,12 +6,14 @@ import com.xx.log.common.pojo.ExtPath;
 import com.xx.log.common.pojo.message.DirMsg;
 import com.xx.log.common.pojo.result.DirResult;
 import com.xx.log.common.util.ConstanceUtil;
+import com.xx.log.common.util.HashUtil;
 import com.xx.log.netty.invoke.InvokeContext;
 import com.xx.log.properties.LogProperties;
 import com.xx.log.session.Global;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -53,7 +55,7 @@ public class RestDataController {
                 String[] split = v.split(";");
                 for (String path : split) {
                     String txt = k + ConstanceUtil.RIGHT_ARROW + path;
-                    col.add(ExtPath.builder().text(txt)
+                    col.add(ExtPath.builder().text(txt).leaf("false")
                             .id(txt) // id在展开节点时会通过node参数带回
                             .build());
                 }
@@ -95,11 +97,12 @@ public class RestDataController {
                 // com.xx.log.message.handler.client.DirCmdHandler.handleMessage
                 // path|name|boolean(dir)
                 String[] attrs = s.split(ConstanceUtil.VERTICAL_DELIMITER);
+                String h_id = "tag[0] + ConstanceUtil.RIGHT_ARROW + attrs[0]";
                 ExtPath path = ExtPath.builder()
-                        .id(tag[0] + ConstanceUtil.RIGHT_ARROW + attrs[0]) // id在展开节点时会通过node参数带回
+                        .id(h_id) // id在展开节点时会通过node参数带回
                         .text(attrs[1])
                         .absPath(attrs[0])
-                        .flag(UUID.randomUUID().toString().replace("-", ""))
+                        .idMD5(HashUtil.getMD5String(h_id))
                         .leaf(attrs[2])
                         .build();
                 list.add(path);
@@ -109,11 +112,12 @@ public class RestDataController {
             if (file.exists() && file.isDirectory()) {
                 File[] listFiles = file.listFiles();
                 for (File f : listFiles) {
+                    String h_id = tag[0] + ConstanceUtil.RIGHT_ARROW + f.getAbsolutePath().replace("\\", "/");
                     ExtPath path = ExtPath.builder()
-                            .id(tag[0] + ConstanceUtil.RIGHT_ARROW + f.getAbsolutePath().replace("\\", "/")) // id在展开节点时会通过node参数带回
+                            .id(h_id) // id在展开节点时会通过node参数带回
                             .text(f.getName())
                             .absPath(f.getAbsolutePath().replace("\\", "/"))
-                            .flag(UUID.randomUUID().toString().replace("-", ""))
+                            .idMD5(HashUtil.getMD5String(h_id))
                             .leaf(String.valueOf(!f.isDirectory()))
                             .build();
                     list.add(path);
@@ -121,5 +125,16 @@ public class RestDataController {
             }
         }
         return list;
+    }
+
+
+    /**
+     * 获得deploykey
+     *
+     * @return String
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/deployKey")
+    public String deployKey() {
+        return UUID.randomUUID().toString().replace("-", "");
     }
 }

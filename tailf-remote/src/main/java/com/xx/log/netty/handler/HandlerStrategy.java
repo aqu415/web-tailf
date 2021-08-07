@@ -1,8 +1,10 @@
 package com.xx.log.netty.handler;
 
-import com.xx.log.common.pojo.message.Message;
 import io.netty.channel.ChannelHandlerContext;
 
+/**
+ * 处理netty消息的策略
+ */
 public interface HandlerStrategy {
 
     void handleMessage(ChannelHandlerContext ctx, String messageJson);

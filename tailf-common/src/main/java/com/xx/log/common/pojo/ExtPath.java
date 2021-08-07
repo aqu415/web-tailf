@@ -9,9 +9,6 @@ public class ExtPath implements Comparable<ExtPath> {
 
     private String id;
 
-    // 标记唯一节点
-    private String flag;
-
     private String text;
 
     private String absPath;
@@ -19,6 +16,9 @@ public class ExtPath implements Comparable<ExtPath> {
     private String leaf;
 
     private String serverIp;
+
+    // 标记唯一节点
+    private String idMD5;
 
     @Override
     public int compareTo(ExtPath o) {

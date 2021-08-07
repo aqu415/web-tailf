@@ -32,6 +32,12 @@ public class LogProperties {
     //如果当前应用角色是slave,则需要配置向master web注册netty端口
     private int masterNettyPort;
 
+    // 自动部署时附件文件所在的目录
+    private String attachmentFilepath;
+
+    // 自动部署时附件文件的名称
+    private String attachmentFileName;
+
     /**
      * 是否是master角色
      *

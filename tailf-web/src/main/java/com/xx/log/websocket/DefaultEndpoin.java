@@ -3,7 +3,7 @@ package com.xx.log.websocket;
 import com.alibaba.fastjson.JSONObject;
 import com.xx.log.cmd.BindContext;
 import com.xx.log.cmd.handler.CmdHandler;
-import com.xx.log.cmd.param.BindPath;
+import com.xx.log.cmd.param.BaseParam;
 import com.xx.log.session.SessionContext;
 import com.xx.log.util.SessionUtil;
 import com.xx.log.util.SpringUtil;
@@ -12,8 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
-import java.net.InetSocketAddress;
 import javax.websocket.server.ServerEndpoint;
+import java.net.InetSocketAddress;
 
 @ServerEndpoint(value = "/websocket01")
 @Component
@@ -75,19 +75,19 @@ public class DefaultEndpoin {
     public void onMessage(String message, Session session) throws Exception {
         if (message != null) {
             log.info("接收到数据:" + message);
-        } else {
-            return;
-        }
-        String clientHost = this.getHost(session);
-        if (clientHost != null) {
-
-            // bind
-            if (message.contains("bind")) {
-                BindPath cmd = JSONObject.parseObject(message, BindPath.class);
-                cmd.setClientHost(clientHost);
-                cmd.setSession(session);
-                CmdHandler handler = SpringUtil.getBean(BindContext.class).getByCmd(cmd);
-                handler.handleCMD(cmd);
+            String clientHost = this.getHost(session);
+            if (clientHost != null) {
+                BaseParam cmd = JSONObject.parseObject(message, BaseParam.class);
+                BindContext bindContext = SpringUtil.getBean(BindContext.class);
+                CmdHandler handler = bindContext.getByCmd(cmd);
+                BaseParam param = bindContext.buildParam(handler, message);
+                param.setSession(session);
+                param.setClientHost(clientHost);
+                if (handler != null) {
+                    handler.handleMessage(param);
+                } else {
+                    log.error("未找到消息处理器");
+                }
             }
         }
     }

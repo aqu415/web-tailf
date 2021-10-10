@@ -1,8 +1,8 @@
 package com.xx.log.netty.invoke;
 
-import com.alibaba.fastjson.JSONObject;
 import com.xx.log.common.pojo.message.Message;
 import com.xx.log.common.util.ConstanceUtil;
+import com.xx.log.common.util.MixUtil;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,7 +23,7 @@ public class InvokeContext {
         threads.put(threadId, result);
         try {
             param.setThreadId(threadId);
-            context.writeAndFlush(JSONObject.toJSONString(param) + ConstanceUtil.DECODER_DELIMITER);
+            context.writeAndFlush(MixUtil.toJsonString(param) + ConstanceUtil.DECODER_DELIMITER);
             boolean res = result.getCountDownLatch().await(5, TimeUnit.SECONDS);
             if (!res) {
                 throw new RuntimeException("timeout:" + param);

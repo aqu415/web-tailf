@@ -1,9 +1,9 @@
 package com.xx.log.message;
 
-import com.alibaba.fastjson.JSONObject;
 import com.xx.log.common.enums.MessageHead;
 import com.xx.log.common.pojo.message.Markable;
 import com.xx.log.common.pojo.message.Message;
+import com.xx.log.common.util.MixUtil;
 import com.xx.log.message.handler.BusinessHandler;
 import com.xx.log.netty.handler.HandlerStrategy;
 import com.xx.log.netty.handler.Msg;
@@ -28,7 +28,7 @@ public class BusinessHandlerStrategy implements HandlerStrategy {
 
     @Override
     public void handleMessage(ChannelHandlerContext ctx, String messageJson) {
-        Markable message = JSONObject.parseObject(messageJson, Markable.class);
+        Markable message = MixUtil.jsonStr2Obj(messageJson, Markable.class);
         MessageHead messageHead = message.getMessageHead();
 
         // 业务处理Handler
@@ -40,9 +40,9 @@ public class BusinessHandlerStrategy implements HandlerStrategy {
                 real = handler;
                 if (MessageHead.RESPONSE == message.getMessageHead()) {
                     Class clazz = InvokeContext.getInvokeResult(message.getThreadId()).getResultMark();
-                    realMessage = (Message)JSONObject.parseObject(messageJson, clazz);
+                    realMessage = (Message) MixUtil.jsonStr2Obj(messageJson, clazz);
                 } else {
-                    realMessage = JSONObject.parseObject(messageJson, msg.body());
+                    realMessage = MixUtil.jsonStr2Obj(messageJson, msg.body());
                 }
                 break;
             }

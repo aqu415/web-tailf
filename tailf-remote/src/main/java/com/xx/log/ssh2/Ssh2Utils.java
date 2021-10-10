@@ -4,6 +4,7 @@ import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.SCPClient;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
+import io.netty.util.internal.StringUtil;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,6 +62,9 @@ public class Ssh2Utils {
      * @return Ssh2Result
      */
     public static Ssh2Result upLoad(String remoteDirPath, String localFilePath, String userName, String password, String ip) {
+        if (StringUtil.isNullOrEmpty(remoteDirPath) || StringUtil.isNullOrEmpty(localFilePath) || StringUtil.isNullOrEmpty(userName) || StringUtil.isNullOrEmpty(ip)) {
+            return Ssh2Result.builder().success(false).msg("远程目录|本地安装包路径|服务器用户名|IP 都不能为空").build();
+        }
         Connection connection = null;
         Ssh2Result ssh2Result = null;
         try {

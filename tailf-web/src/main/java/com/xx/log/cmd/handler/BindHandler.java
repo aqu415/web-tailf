@@ -1,11 +1,11 @@
 package com.xx.log.cmd.handler;
 
-import com.xx.log.cmd.Cmd;
+import com.xx.log.cmd.CMD;
 import com.xx.log.cmd.param.BaseParam;
 import com.xx.log.cmd.param.BindPath;
 import com.xx.log.common.util.FileUtil;
 import com.xx.log.monitor.local.MonitorContext;
-import com.xx.log.properties.LogProperties;
+import com.xx.log.properties.AppProperties;
 import com.xx.log.session.SessionContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,14 +14,14 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 
-@Cmd(param = BindPath.class, cmd = "bind")
+@CMD(param = BindPath.class, cmd = "bind")
 @Service
 @Slf4j
 public class BindHandler implements CmdHandler {
 
     // logProperties
     @Resource
-    private LogProperties logProperties;
+    private AppProperties appProperties;
 
     /**
      * 处理订阅目录请求
@@ -41,7 +41,7 @@ public class BindHandler implements CmdHandler {
 
         try {
             // 获得文件最后n行内容
-            String lastContent = FileUtil.readLastRows(bindPath.getPathKey(), logProperties.getDefaultShowLineNum(),
+            String lastContent = FileUtil.readLastRows(bindPath.getPathKey(), appProperties.getDefaultShowLineNum(),
                     bindPath.getSearchKey());
             bindPath.getSession().getBasicRemote().sendText(lastContent);
             // 记录内容读取偏移量

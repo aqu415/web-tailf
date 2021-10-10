@@ -4,13 +4,11 @@
 
 码云(https://gitee.com/aqu415/tailf)
 
-github同步(https://github.com/aqu415/tailf)
-
 CSDN(https://blog.csdn.net/Aqu415/article/details/114419320)
 
-### 背景
-> 前一段时间由于项目原因，需要经常上服务器看日志；由于没有公共的页面查看与下载，就需要频繁的登录服务器，然后执行一堆命令，最后才能看到日志；
-> 这个过程太繁琐痛苦，网上搜了一圈没有合适的工具，于是自己写了一个简单的日志实时查看的工具；
+### 背景 
+前一段时间由于项目原因，需要经常上服务器看日志；由于没有公共的页面查看与下载，就需要频繁的登录服务器，然后执行一堆命令，最后才能看到日志；
+这个过程太繁琐痛苦，网上搜了一圈没有合适的工具，于是自己写了一个简单的日志实时查看的工具；
 
 ### 原理
 1. Websocket + FileAlterationListenerAdaptor：通过监听文件变化，再增量获得变化的内容通过websocket发送给浏览器客户端
@@ -18,6 +16,18 @@ CSDN(https://blog.csdn.net/Aqu415/article/details/114419320)
 
 ### gitee地址
 https://gitee.com/aqu415/tailf
+
+### 原理
+
+<hr>
+整体架构：
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210612181836239.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FxdTQxNQ==,size_16,color_FFFFFF,t_70)
+
+内部实现：
+1. Websocket + FileAlterationListenerAdaptor：通过监听文件变化，增量获得变化的内容通过websocket发送给浏览器客户端
+2. 多服务器场景下master与slave之间netty连接（异常后重连逻辑未开发）
+
 
 ### 特性
 1. 支持界面实时查看、搜索日志功能
@@ -43,16 +53,40 @@ https://gitee.com/aqu415/tailf
 
 支持监听多个目录
 ```
-linux后台运行:
-nohup java -jar tailf-web-1.0-xxx.jar "/usr/logs/tomcat1" "/usr/logs/tomcat2" &
-or
-java -jar tailf-web-1.0-xxx.jar "/usr/logs/tomcat1" "/usr/logs/tomcat2" &
+linux:
 
-windows窗口启动
-java -jar tailf-web-1.0-xxx.jar "/usr/logs/tomcat1" "/usr/logs/tomcat2"
+使用springboot参数策略：
+java -jar -Dtailf.monitor-path=/usr/logs/tomcat1;/usr/logs/tomcat2 tailf-web-xxx.jar &
+或
+java -jar tailf-web-xxx.jar --tailf.monitor-path=/usr/logs/tomcat1;/usr/logs/tomcat2 &
+具体参数会在下面列表列举
+
+或者指定整个配置文件 
+java -jar tailf-web-xxx.jar --spring.config.location=/usr/local/application.yaml &
+
+
+windows：
+
+使用springboot参数策略：
+java -jar -Dtailf.monitor-path=/usr/logs/tomcat1;/usr/logs/tomcat2 tailf-web-xxx.jar
+或
+java -jar tailf-web-1.0-xxx.jar --tailf.monitor-path=d:/tomcat1;d:/tomcat2
+
+或者指定整个配置文件 
+java -jar tailf-web-xxx.jar --spring.config.location=d:/application.yaml
 ```
 
-### 效果
+|参数名称|备注|属性|
+|----|----|----|
+|tailf.monitor-path|本地监听目录，可以设置多个以 ; 隔开|com.xx.log.properties.AppProperties|
+|tailf.default-show-line-num|默认初始显示内容行数|同上|
+|tailf.web-role|当前应用的角色（master、slave）|同上|
+|tailf.master-netty-host|如果当前应用角色是slave,则需要配置向master web注册IP|同上|
+|tailf.master-netty-port|如果当前应用角色是slave,则需要配置向master web注册netty端口|同上|
+
+参考：[spring boot参数传递](https://www.cnblogs.com/wangxiaofengde/p/12618426.html)
+
+### 界面视图
 #### Extjs风格
 +  访问地址：http://localhost:10086/
 
@@ -92,4 +126,4 @@ master控制台打印slave注册信息：
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210520092451791.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0FxdTQxNQ==,size_16,color_FFFFFF,t_70)
 
-支持文件下载和搜索
+文件支持下载和搜索

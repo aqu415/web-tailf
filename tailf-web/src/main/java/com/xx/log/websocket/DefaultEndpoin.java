@@ -1,9 +1,9 @@
 package com.xx.log.websocket;
 
-import com.alibaba.fastjson.JSONObject;
 import com.xx.log.cmd.BindContext;
 import com.xx.log.cmd.handler.CmdHandler;
 import com.xx.log.cmd.param.BaseParam;
+import com.xx.log.common.util.MixUtil;
 import com.xx.log.session.SessionContext;
 import com.xx.log.util.SessionUtil;
 import com.xx.log.util.SpringUtil;
@@ -77,7 +77,7 @@ public class DefaultEndpoin {
             log.info("接收到数据:" + message);
             String clientHost = this.getHost(session);
             if (clientHost != null) {
-                BaseParam cmd = JSONObject.parseObject(message, BaseParam.class);
+                BaseParam cmd = MixUtil.jsonStr2Obj(message, BaseParam.class);
                 BindContext bindContext = SpringUtil.getBean(BindContext.class);
                 CmdHandler handler = bindContext.getByCmd(cmd);
                 BaseParam param = bindContext.buildParam(handler, message);

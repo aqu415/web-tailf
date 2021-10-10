@@ -16,9 +16,9 @@
  */
 package com.xx.log.netty;
 
-import com.alibaba.fastjson.JSONObject;
 import com.xx.log.common.pojo.message.Message;
 import com.xx.log.common.util.ConstanceUtil;
+import com.xx.log.common.util.MixUtil;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,6 +56,6 @@ public class RemotingUtil {
      * @param message
      */
     public static void writeAndFlushMessage(ChannelHandlerContext context, Message message) {
-        context.writeAndFlush(JSONObject.toJSONString(message) + ConstanceUtil.DECODER_DELIMITER);
+        context.writeAndFlush(MixUtil.toJsonString(message) + ConstanceUtil.DECODER_DELIMITER);
     }
 }

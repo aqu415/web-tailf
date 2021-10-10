@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-public @interface Cmd {
+public @interface CMD {
     
     Class<? extends BaseParam> param();
 

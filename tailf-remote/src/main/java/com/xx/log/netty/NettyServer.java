@@ -50,17 +50,17 @@ public class NettyServer {
 
         // worker
         int threadCount = 4;
-        if (RemotingUtil.isLinuxPlatform()) {
-            this.eventLoopGroupSelector = new EpollEventLoopGroup(threadCount, new ThreadFactory() {
-                private AtomicInteger threadIndex = new AtomicInteger(0);
-                private int threadTotal = threadCount;
-
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, String.format("NettyServerEPOLLSelector_%d_%d", threadTotal, this.threadIndex.incrementAndGet()));
-                }
-            });
-        } else {
+//        if (RemotingUtil.isLinuxPlatform()) {
+//            this.eventLoopGroupSelector = new EpollEventLoopGroup(threadCount, new ThreadFactory() {
+//                private AtomicInteger threadIndex = new AtomicInteger(0);
+//                private int threadTotal = threadCount;
+//
+//                @Override
+//                public Thread newThread(Runnable r) {
+//                    return new Thread(r, String.format("NettyServerEPOLLSelector_%d_%d", threadTotal, this.threadIndex.incrementAndGet()));
+//                }
+//            });
+//        } else {
             this.eventLoopGroupSelector = new NioEventLoopGroup(threadCount, new ThreadFactory() {
                 private AtomicInteger threadIndex = new AtomicInteger(0);
                 private int threadTotal = threadCount;
@@ -70,7 +70,7 @@ public class NettyServer {
                     return new Thread(r, String.format("NettyServerNIOSelector_%d_%d", threadTotal, this.threadIndex.incrementAndGet()));
                 }
             });
-        }
+//        }
     }
 
     public void start(HandlerStrategy handlerStrategy) {

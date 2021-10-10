@@ -1,6 +1,5 @@
 package com.xx.log.netty.handler;
 
-import com.alibaba.fastjson.JSONObject;
 import com.xx.log.common.enums.Role;
 import com.xx.log.common.pojo.message.Message;
 import com.xx.log.common.util.ConstanceUtil;

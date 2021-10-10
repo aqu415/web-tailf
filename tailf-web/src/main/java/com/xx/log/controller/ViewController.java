@@ -1,7 +1,5 @@
 package com.xx.log.controller;
 
-import com.xx.log.properties.LogProperties;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,26 +13,16 @@ import java.net.URLEncoder;
 @Controller
 public class ViewController {
 
-    /**
-     * logProperties
-     */
-    private LogProperties logProperties;
-
-    @Autowired
-    public ViewController(LogProperties logProperties) {
-        this.logProperties = logProperties;
-    }
-
 
     /**
-     * 跳转ext主页
+     * 跳转ext主界面
      *
      * @param model
      * @return
      */
-    @GetMapping(path = {"/", "/e"})
+    @GetMapping(path = {"/", "/m"})
     public String ext(Model model) {
-        return "ext";
+        return "main";
     }
 
     /***

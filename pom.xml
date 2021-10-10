@@ -7,7 +7,7 @@
     <groupId>org.example</groupId>
     <artifactId>tailf</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.2.1-SNAPSHOT</version>
     <modules>
         <module>tailf-common</module>
         <module>tailf-monitor</module>
@@ -28,6 +28,8 @@
         <netty-all.version>4.1.39.Final</netty-all.version>
         <commons-io.version>2.6</commons-io.version>
         <ganymed-ssh2.version>build210</ganymed-ssh2.version>
+        <hibernate-vali.version>${hibernate-validator.version}</hibernate-vali.version>
+        <jackson-annotations.version>2.10.1</jackson-annotations.version>
     </properties>
 
     <dependencies>

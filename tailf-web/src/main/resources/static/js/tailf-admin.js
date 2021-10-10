@@ -18,7 +18,7 @@ function showAdmin() {
         };
 
         let btn = Ext.create('Ext.Button', {
-            x: 500, y: 70,
+            x: 400, y: 70,
             text: '添加',
             listeners: {
                 click: function () {
@@ -58,7 +58,7 @@ function showAdmin() {
             items: [
                 {x: 10, y: 10, xtype: 'label', text: 'Slave IP:'}, {x: 70, y: 10, id: 'ip'}, {x: 260, y: 10, xtype: 'label', text: '用户名:'}, {x: 330, y: 10, id: 'userName'},
                 {x: 10, y: 40, xtype: 'label', text: '密码：'}, {x: 70, y: 40, id: 'pw'}, {x: 260, y: 40, xtype: 'label', text: '部署路径:'}, {x: 330, y: 40, id: 'remoteDir'},
-                {x: 10, y: 70, xtype: 'label', text: '日志路径：'}, {x: 70, y: 70, id: 'logPath', width: 400}, btn,
+                {x: 10, y: 70, xtype: 'label', text: '日志路径：'}, {x: 70, y: 70, id: 'logPath', width: 260}, btn,
                 {x: 0, y: 120, xtype: 'textareafield', anchor: '100% 100%', id: 'msg_'}/*控件从居左0px处拉长100%，空间从居上80px处，拉长至余下控件高度的80%处*/
             ],
         });

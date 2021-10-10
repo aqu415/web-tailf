@@ -1,8 +1,8 @@
 package com.xx.log.cmd;
 
-import com.alibaba.fastjson.JSONObject;
 import com.xx.log.cmd.handler.CmdHandler;
 import com.xx.log.cmd.param.BaseParam;
+import com.xx.log.common.util.MixUtil;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +23,7 @@ public class BindContext {
      */
     public CmdHandler getByCmd(BaseParam baseParam) {
         for (CmdHandler cmdHandler : cmdHandlers) {
-            Cmd cmd = AnnotationUtils.findAnnotation(cmdHandler.getClass(), Cmd.class);
+            CMD cmd = AnnotationUtils.findAnnotation(cmdHandler.getClass(), CMD.class);
             if (cmd != null && cmd.cmd().equals(baseParam.getCmd())) {
                 return cmdHandler;
             }
@@ -39,7 +39,7 @@ public class BindContext {
      * @return BaseParam
      */
     public BaseParam buildParam(CmdHandler handler, String message) {
-        Cmd cmd = AnnotationUtils.findAnnotation(handler.getClass(), Cmd.class);
-        return JSONObject.parseObject(message, cmd.param());
+        CMD cmd = AnnotationUtils.findAnnotation(handler.getClass(), CMD.class);
+        return MixUtil.jsonStr2Obj(message, cmd.param());
     }
 }

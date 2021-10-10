@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Web tailf</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/ext-4.2.1/resources/css/ext-all.css}" type="text/css">
+    <script type="text/javascript" th:src="@{/ext-4.2.1/ext-all.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery-1.8.3.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.cookie.js}"></script>
+    <script type="text/javascript" th:src="@{/js/tailf-aboutTree.js}"></script>
+    <script type="text/javascript" th:src="@{/js/tailf-admin.js}"></script>
+    <script type="text/javascript" th:src="@{/js/tailf-common.js}"></script>
+    <script type="text/javascript" th:src="@{/js/tailf-socket.js}"></script>
+
+    <script type="text/javascript">
+        console.log('csdn：https://blog.csdn.net/Aqu415/article/details/114419320');
+        console.log('gitee：https://gitee.com/aqu415/tailf');
+
+        Ext.require(['*']);
+        let view_;
+        Ext.onReady(function () {
+
+                Ext.QuickTips.init();
+                Ext.state.Manager.setProvider(Ext.create('Ext.state.CookieProvider'));
+
+                /**数节点数据源*/
+                let tree_store = Ext.create('Ext.data.TreeStore', {
+                    proxy: {
+                        type: 'ajax',
+                        url: '/extPath',
+                        reader: {
+                            type: 'json',
+                            root: 'treeList'
+                        }
+                    },
+                    listeners: {
+                        'beforeload': function (store, op, options) {
+                            let params = {
+                                //参数
+                                flag: 'ooo'
+                            };
+                            Ext.apply(store.proxy.extraParams, params);
+                        }
+                    },
+                    folderSort: true
+                });
+
+                /**左侧树结构*/
+                let tree_panel = Ext.create('Ext.tree.Panel', {
+                    region: 'center',
+                    store: tree_store,
+                    useArrows: true,
+                    rootVisible: false,
+                    listeners: {
+                        'itemclick': treeItemClick/**点击树节点*/,
+                        'itemcontextmenu': itemContextMenu_/**显示右键菜单*/
+                    }
+                });
+
+                /**显示右键菜单
+                 * this_obj : Ext.tree.Panel
+                 * record : Ext.data.Model The record that belongs to the item
+                 * item : HTMLElement The item's element
+                 * index : Number The item's index
+                 * e : Ext.EventObject The raw event object
+                 * eOpts : Object  The options object passed to Ext.util.Observable.addListener.
+                 */
+                function itemContextMenu_(panel, record, item, index, e, eOpts) {
+                    //禁用浏览器的右键相应事件
+                    e.preventDefault();
+                    e.stopEvent();
+
+                    let leaf = record.data.leaf;
+                    // 判断是否可以下载
+                    let oriId = record.data.id;
+                    if (can_down_load(oriId)) {
+                        // 初始化右键菜单
+                        let menu = new Ext.menu.Menu({
+                            // id: 'theContextMenu',
+                            items: [{
+                                text: '下载文件',
+                                handler: function (item) {
+                                    let t = oriId.split("->");
+                                    window.open("http://" + t[0] + "/dl?path=" + encodeURI(t[1]));
+                                }
+                            }]
+                        });
+                        menu.showAt(e.getXY());
+                    } else if (!leaf) {
+                        // 不是根节点，展示“刷新节点”的右键菜单
+                        let menu = new Ext.menu.Menu({
+                            // id: 'theContextMenu',
+                            items: [{
+                                text: '刷新节点',
+                                handler: function (item, p1, p2) {
+                                    let store = panel.getStore();
+                                    let node_id = record.getId();
+                                    let node_v = store.treeStore.getNodeById(node_id);
+                                    store.treeStore.load({
+                                        node: node_v,
+                                        callback: function () {
+                                            record.expand();
+                                        }
+                                    });
+                                }
+                            }]
+                        });
+                        menu.showAt(e.getXY());
+                    }
+                }
+
+                /**判断哪些能够进行下载*/
+                function can_down_load(file_name) {
+                    return endWith(file_name, '.log') || endWith(file_name, '.txt') || endWith(file_name, '.gz')
+                }
+
+                /**tab 点击展示*/
+                function itemShow(tabPanel, newCard, oldCard, eOpts) {
+                }
+
+                function endWith(src, str) {
+                    let reg = new RegExp(str + "$");
+                    return reg.test(src);
+                }
+
+                /**点击树节点*/
+                function treeItemClick(panel, record, item, index, e, eOpts) {
+                    // id 为展开节点时传到后台的node参数
+                    let ori_id = record.data.id;
+
+                    let leaf = record.data.leaf;
+                    let text = record.data.text;
+
+                    let id_hash = record.raw.idMD5;
+                    if (leaf) {
+                        if (!(endWith(ori_id, '.log') || endWith(ori_id, '.txt'))) {
+                            return;
+                        }
+
+                        let tab_item = Ext.getCmp(id_hash);
+                        let tab_panel = Ext.getCmp('tab_');
+                        if (!tab_item) {
+                            let t = ori_id.split("->");
+                            tab_item = {
+                                tbar: ['-',
+                                    {
+                                        xtype: 'button', text: '下载', listeners: {
+                                            'click': function () {
+                                                window.open("http://" + t[0] + "/dl?a=b&path=" + encodeURI(t[1]));
+                                            }
+                                        }
+                                    }, '-'
+                                ],
+                                title: text,
+                                id: id_hash,
+                                html: '<iframe id="F' + id_hash + '" frameborder="0" src="http://' + t[0] + '/d?pathKey=' + t[1] + '" width="100%" height="100%"></iframe>',
+                                closable: true
+                            };
+                            tab_panel.add(tab_item);
+                        }
+                        tab_panel.setActiveTab(id_hash);
+                    }
+                }
+
+                view_ = Ext.create('Ext.Viewport', {
+                    id: 'border-example',
+                    layout: 'border',
+                    items: [
+                        // create instance immediately
+                        Ext.create('Ext.Component', {
+                            region: 'north',
+                            contentEl: 'north_',   //加载id为“north_“的元素
+                            height: 32             // give north and south regions a height
+                        }),
+                        {
+                            region: 'west',
+                            stateId: 'navigation-panel',
+                            id: 'west-panel', // see Ext.getCmp() below
+                            split: true,      // 可拖拽改变宽度
+                            width: 200,
+                            minWidth: 175,
+                            margins: '0 0 0 1',//上 右 下 左
+                            layout: 'border',
+                            stateful: true,
+                            items: [tree_panel]
+                        },
+                        // in this instance the TabPanel is not wrapped by another panel since no title is needed, this Panel is added directly as a Container
+                        Ext.create('Ext.tab.Panel', {
+                            region: 'center', // a center region is ALWAYS required for border layout
+                            id: 'tab_',
+                            listeners: {'tabchange': itemShow}
+                        })]
+                });
+
+                setTimeout(function () {
+                    // showAdmin();
+                }, 300);
+            }
+        );
+    </script>
+</head>
+<body>
+
+<div id="north_">
+    <h5 style="padding-left: 3px;display: inline">日志实时查看工具</h5>
+    <!--<span style="float: right;margin-right: 20px;"><a href="javascript:void(0);" onclick="showAdmin()">Slave部署</a></span>-->
+</div>
+</body>
+</html>

@@ -1,14 +1,14 @@
 package com.xx.log.controller;
 
 
-import com.alibaba.fastjson.JSON;
 import com.xx.log.common.pojo.ExtPath;
 import com.xx.log.common.pojo.message.DirMsg;
 import com.xx.log.common.pojo.result.DirResult;
 import com.xx.log.common.util.ConstanceUtil;
 import com.xx.log.common.util.HashUtil;
+import com.xx.log.common.util.MixUtil;
 import com.xx.log.netty.invoke.InvokeContext;
-import com.xx.log.properties.LogProperties;
+import com.xx.log.properties.AppProperties;
 import com.xx.log.session.Global;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public class RestDataController {
 
     // logProperties
     @Resource
-    private LogProperties logProperties;
+    private AppProperties appProperties;
 
     /**
      * 获得子目录、文件
@@ -72,7 +72,7 @@ public class RestDataController {
         // 组装返回值
         Map<String, List<ExtPath>> map = new HashMap<>();
         map.put("treeList", collection);
-        return JSON.toJSONString(map);
+        return MixUtil.toJsonString(map);
     }
 
     /**
@@ -97,7 +97,7 @@ public class RestDataController {
                 // com.xx.log.message.handler.client.DirCmdHandler.handleMessage
                 // path|name|boolean(dir)
                 String[] attrs = s.split(ConstanceUtil.VERTICAL_DELIMITER);
-                String h_id = "tag[0] + ConstanceUtil.RIGHT_ARROW + attrs[0]";
+                String h_id = tag[0] + ConstanceUtil.RIGHT_ARROW + attrs[0];
                 ExtPath path = ExtPath.builder()
                         .id(h_id) // id在展开节点时会通过node参数带回
                         .text(attrs[1])

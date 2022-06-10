@@ -76,13 +76,15 @@ public class FileUtil {
 
     /**
      * 获得最后n行（并根据关键字过滤）
+     *
      * @param filePath
      * @param rows
      * @param searchKey
+     * @param encoding  编码
      * @return
      * @throws IOException
      */
-    public static String readLastRows(String filePath, int rows, String searchKey) throws IOException {
+    public static String readLastRows(String filePath, int rows, String searchKey, String encoding) throws IOException {
         try (RandomAccessFile rf = new RandomAccessFile(filePath, "r")) {
             // 返回值
             StringBuilder info = new StringBuilder();
@@ -101,7 +103,7 @@ public class FileUtil {
                     lineSeparatorNum++;
                     // 读取文本
                     long cur = rf.getFilePointer();
-                    String line = getLine(rf, cur, lineEnd);
+                    String line = getLine(rf, cur, lineEnd, encoding);
                     if (searchKey == null || searchKey.length() == 0 || line.contains(searchKey)) {
                         info.insert(0, line);
                     }
@@ -111,7 +113,7 @@ public class FileUtil {
                 if (pointer == -1 && lineSeparatorNum < rows) {
                     rf.seek(0);
                     //读取文本
-                    String line = getLine(rf, 0, lineEnd);
+                    String line = getLine(rf, 0, lineEnd, encoding);
                     if (searchKey == null || searchKey.length() == 0 || line.contains(searchKey)) {
                         info.insert(0, line);
                     }
@@ -121,9 +123,9 @@ public class FileUtil {
         }
     }
 
-    private static String getLine(RandomAccessFile rf, long start, long end) throws IOException {
+    private static String getLine(RandomAccessFile rf, long start, long end, String encoding) throws IOException {
         byte[] tempBytes = new byte[(int) (end - start)];
         rf.readFully(tempBytes);
-        return new String(tempBytes, "utf-8");
+        return new String(tempBytes, encoding);
     }
 }

@@ -5,7 +5,7 @@ import com.xx.log.cmd.param.BaseParam;
 import com.xx.log.cmd.param.BindPath;
 import com.xx.log.common.util.FileUtil;
 import com.xx.log.monitor.local.MonitorContext;
-import com.xx.log.properties.AppProperties;
+import com.xx.log.config.properties.AppProperties;
 import com.xx.log.session.SessionContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,8 +41,9 @@ public class BindHandler implements CmdHandler {
 
         try {
             // 获得文件最后n行内容
+            String encoding = appProperties.getLogFileEncoding() == null ? "utf-8" : appProperties.getLogFileEncoding();
             String lastContent = FileUtil.readLastRows(bindPath.getPathKey(), appProperties.getDefaultShowLineNum(),
-                    bindPath.getSearchKey());
+                    bindPath.getSearchKey(), encoding);
             bindPath.getSession().getBasicRemote().sendText(lastContent);
             // 记录内容读取偏移量
             MonitorContext.setOffset(file.getAbsolutePath(), file.length());

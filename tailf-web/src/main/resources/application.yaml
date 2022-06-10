@@ -27,11 +27,15 @@ tailf:
   # master netty IP（配置成内网IP,master-slave模式会使用该配置）
   master-netty-host: 127.0.0.1
 
-  #master netty port（master-slave模式会使用该配置）
+  # master netty port（master-slave模式会使用该配置，为空时不启动netty server）
   master-netty-port: 10085
 
-  # 自动部署时附件文件所在的目录
-  attachment-file-path: e:/repository/org/example/tailf-web/1.2.0-SNAPSHOT/
+  # 日志文件读取时使用的文件编码
+  log_file_encoding: utf-8
 
-  # 自动部署时附件文件的名称(注意：该配置要与上面的 attachment-file-path 能组成正确的文件路径)
-  attachment-file-name: tailf-web-1.2.0-SNAPSHOT.jar
+  deploy:
+    # 自动部署时附件文件所在的目录
+    attachment-file-path: e:/repository/org/example/tailf-web/1.2.0-SNAPSHOT/
+
+    # 自动部署时附件文件的名称(注意：该配置要与上面的 attachment-file-path 能组成正确的文件路径)
+    attachment-file-name: tailf-web-1.2.0-SNAPSHOT.jar

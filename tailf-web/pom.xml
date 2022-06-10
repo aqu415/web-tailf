@@ -4,21 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>tailf</artifactId>
-        <groupId>org.example</groupId>
+        <groupId>com.xx</groupId>
         <version>1.2.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>tailf-web</artifactId>
 
-    <dependencies>
+    <properties>
+        <app.dir>app</app.dir>
+    </properties>
 
-        <!-- 应用支持热部署
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <optional>true</optional>
-        </dependency>
-        -->
+    <dependencies>
 
         <!-- web -->
         <dependency>
@@ -48,32 +44,20 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <version>2.0.5.RELEASE</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.example</groupId>
-            <artifactId>tailf-monitor</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.example</groupId>
+            <groupId>com.xx</groupId>
             <artifactId>tailf-remote</artifactId>
             <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
         </dependency>
     </dependencies>
 
@@ -83,7 +67,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <!-- 工程主入口-->
+                    <!-- 启动主类-->
                     <mainClass>com.xx.log.LogApplication</mainClass>
                 </configuration>
                 <executions>
@@ -94,7 +78,54 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <!--docker-maven-plugin start-->
+                <groupId>com.spotify</groupId>
+                <!--文档参考 https://github.com/spotify/docker-maven-plugin -->
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <configuration>
+
+                    <!--============================================仓库相关配置================================================-->
+                    <!--私有仓库地址-->
+                    <registryUrl>192.168.126.99:5000</registryUrl>
+                    <!--
+                    docker api地址
+                    构建镜像是通过调用在 http://192.168.126.99:2375 上的api构建image，以便后续推送到registryUrl上；
+                    如果本地开启了docker api，这个地方也可以填本地的docker api地址
+                    -->
+                    <dockerHost>http://192.168.126.99:2375</dockerHost>
+                    <!--是否推送镜像-->
+                    <pushImage>true</pushImage>
+                    <!--推送后是否覆盖已存在的标签镜像-->
+                    <forceTags>true</forceTags>
+
+                    <!--=============================================构建相关配置===============================================-->
+                    <!--镜像名称-->
+                    <imageName>192.168.126.99:5000/${project.artifactId}:${project.version}</imageName>
+
+                    <!--
+                    To use a Dockerfile, you must specify the dockerDirectory element.
+                    If specified, the baseImage, maintainer, cmd and entryPoint elements will be ignored.
+                    The contents of the dockerDirectory will be copied into ${project.build.directory}/docker.
+                    Use the resources element to copy additional files, such as the service's jar file.
+                    -->
+                    <dockerDirectory>${project.basedir}/docker_file</dockerDirectory>
+
+                    <!--插件会将需要的资源拷贝到 docker目录下，供Dockerfile里构建镜像使用-->
+                    <resources>
+                        <resource>
+                            <targetPath>/${app.dir}</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                            <include>classes/application.yaml</include>
+                        </resource>
+                    </resources>
+                </configuration>
+                <!--docker-maven-plugin end-->
+            </plugin>
+
         </plugins>
     </build>
-
 </project>

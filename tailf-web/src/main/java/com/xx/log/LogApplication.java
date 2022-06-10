@@ -4,13 +4,15 @@ import com.xx.log.common.util.IPUtil;
 import com.xx.log.netty.NettyClient;
 import com.xx.log.netty.NettyServer;
 import com.xx.log.netty.handler.HandlerStrategy;
-import com.xx.log.properties.AppProperties;
+import com.xx.log.config.properties.AppProperties;
 import com.xx.log.session.Global;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.util.StringUtils;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 
 import javax.annotation.Resource;
@@ -18,6 +20,7 @@ import javax.annotation.Resource;
 @SpringBootApplication
 @EnableWebSocket
 @Slf4j
+@EnableConfigurationProperties
 public class LogApplication implements InitializingBean {
 
     // 保存文件监听参数
@@ -43,7 +46,7 @@ public class LogApplication implements InitializingBean {
         String[] paths = this.appProperties.getMonitorPath().split(";");
 
         // master|slave
-        if (this.appProperties.isMaster()) {
+        if (this.appProperties.isMaster() && !StringUtils.isEmpty(this.appProperties.getMasterNettyPort())) {
             NettyServer nettyServer = new NettyServer(this.appProperties.getMasterNettyPort());
             nettyServer.start(handlerStrategy);
 

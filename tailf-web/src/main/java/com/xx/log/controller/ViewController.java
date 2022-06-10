@@ -22,7 +22,7 @@ public class ViewController {
      */
     @GetMapping(path = {"/", "/m"})
     public String ext(Model model) {
-        return "main";
+        return "index";
     }
 
     /***

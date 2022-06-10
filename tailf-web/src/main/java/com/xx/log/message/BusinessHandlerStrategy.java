@@ -12,6 +12,7 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 
@@ -36,6 +37,7 @@ public class BusinessHandlerStrategy implements HandlerStrategy {
         Message realMessage = null;
         for (BusinessHandler handler : businessHandlers) {
             Msg msg = AnnotationUtils.findAnnotation(handler.getClass(), Msg.class);
+            Assert.notNull(msg, String.format("%s 应该有@Msg注解，但是没有找到！", handler.getClass().getName()));
             if (msg.head() == message.getMessageHead()) {
                 real = handler;
                 if (MessageHead.RESPONSE == message.getMessageHead()) {
@@ -52,7 +54,7 @@ public class BusinessHandlerStrategy implements HandlerStrategy {
         if (real != null) {
             real.handleMessage(ctx, realMessage);
         } else {
-            log.warn("there`s not messageHandler to handle：" + messageHead);
+            log.warn("there`s no messageHandler to handle：" + messageHead);
         }
     }
 }

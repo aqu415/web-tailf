@@ -8,7 +8,7 @@ import com.xx.log.common.util.ConstanceUtil;
 import com.xx.log.common.util.HashUtil;
 import com.xx.log.common.util.MixUtil;
 import com.xx.log.netty.invoke.InvokeContext;
-import com.xx.log.properties.AppProperties;
+import com.xx.log.config.properties.AppProperties;
 import com.xx.log.session.Global;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
